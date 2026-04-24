@@ -1,0 +1,2139 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>高校化学・無機化学 学習プログラム</title>
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: "Hiragino Sans", "Yu Gothic", "Meiryo", "Helvetica Neue", Arial, sans-serif;
+    background: linear-gradient(135deg, #FFF7ED 0%, #FEF3C7 30%, #DBEAFE 70%, #EDE9FE 100%);
+    min-height: 100vh;
+    color: #111;
+    line-height: 1.5;
+  }
+  button { font-family: inherit; }
+  .container { max-width: 960px; margin: 0 auto; padding: 20px 16px; }
+
+  /* ---------- Header ---------- */
+  .header {
+    background: linear-gradient(135deg, #fff, #fef3c7);
+    border-radius: 24px;
+    padding: 24px 28px;
+    margin-bottom: 20px;
+    box-shadow: 0 10px 40px rgba(0,0,0,.08);
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: ''; position: absolute; top: -30px; right: -30px;
+    width: 160px; height: 160px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(251,191,36,.27), transparent);
+  }
+  .header::after {
+    content: ''; position: absolute; bottom: -40px; left: -20px;
+    width: 130px; height: 130px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(96,165,250,.2), transparent);
+  }
+  .header-inner { position: relative; }
+  .header-tag { font-size: 13px; color: #888; letter-spacing: 2px; margin-bottom: 4px; }
+  .header-title {
+    font-size: 32px; font-weight: 900; margin: 0;
+    background: linear-gradient(135deg, #F59E0B, #EC4899, #8B5CF6);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .header-sub { font-size: 14px; color: #666; margin-top: 4px; }
+  .stat-row { display: flex; gap: 16px; margin-top: 20px; flex-wrap: wrap; }
+  .stat-card {
+    background: #fff; border-radius: 12px; padding: 12px 18px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.05); flex: 1; min-width: 140px;
+  }
+  .stat-label { font-size: 11px; color: #999; }
+  .stat-val { font-size: 24px; font-weight: 800; }
+  .stat-val.amber { color: #F59E0B; }
+  .stat-val.purple { color: #8B5CF6; }
+  .stat-bar { height: 6px; background: #F3F4F6; border-radius: 3px; margin-top: 6px; overflow: hidden; }
+  .stat-bar-fill { height: 100%; background: linear-gradient(90deg, #F59E0B, #EC4899); transition: width .5s; }
+
+  /* ---------- Legend ---------- */
+  .legend {
+    background: #fff; border-radius: 16px; padding: 14px 18px;
+    margin-bottom: 16px; font-size: 13px; color: #555;
+    box-shadow: 0 2px 8px rgba(0,0,0,.05);
+  }
+  .legend-title { font-weight: 700; margin-bottom: 6px; font-size: 14px; }
+  .legend-items { display: flex; gap: 14px; flex-wrap: wrap; }
+  .mark-dot {
+    display: inline-block; width: 22px; height: 22px; border-radius: 50%;
+    color: #fff; text-align: center; font-weight: 700; line-height: 22px; font-size: 12px;
+  }
+  .mark-A { background: #10B981; }
+  .mark-B { background: #F59E0B; }
+  .mark-C { background: #EF4444; }
+
+  /* ---------- Unit Grid ---------- */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+  .unit-card {
+    background: #fff; border-radius: 18px; padding: 16px;
+    box-shadow: 0 4px 14px rgba(0,0,0,.06);
+    position: relative; overflow: hidden;
+    transition: transform .2s, box-shadow .2s;
+    border: 2px solid transparent;
+  }
+  .unit-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,.1); }
+  .unit-card.passed { border-color: var(--unit-color); }
+  .unit-card-blob {
+    position: absolute; top: -20px; right: -20px;
+    width: 90px; height: 90px; border-radius: 50%;
+    background: var(--unit-bg); opacity: .55;
+  }
+  .unit-card-inner { position: relative; }
+  .unit-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .unit-symbol {
+    width: 44px; height: 44px; border-radius: 10px;
+    background: linear-gradient(135deg, var(--unit-color), var(--unit-color-d));
+    color: #fff; display: flex; align-items: center; justify-content: center;
+    font-weight: 900; font-size: 18px;
+    box-shadow: 0 3px 8px var(--unit-glow);
+  }
+  .unit-title { font-size: 17px; font-weight: 800; color: #111; }
+  .unit-idx { font-size: 11px; color: #aaa; }
+  .unit-check { font-size: 22px; }
+  .unit-intro-mini { font-size: 12.5px; color: #666; margin-bottom: 10px; line-height: 1.45; min-height: 36px; }
+  .unit-stats {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 10px; font-size: 11px; color: #888; flex-wrap: wrap; gap: 4px;
+  }
+  .mark-row { display: flex; gap: 4px; margin-bottom: 10px; }
+  .mark-btn {
+    flex: 1; padding: 6px 0; font-size: 12px; font-weight: 700;
+    border-radius: 8px; cursor: pointer; transition: all .15s;
+    background: #fff;
+  }
+  .mark-btn.A { border: 2px solid #10B981; color: #10B981; }
+  .mark-btn.B { border: 2px solid #F59E0B; color: #F59E0B; }
+  .mark-btn.C { border: 2px solid #EF4444; color: #EF4444; }
+  .mark-btn.active.A { background: #10B981; color: #fff; }
+  .mark-btn.active.B { background: #F59E0B; color: #fff; }
+  .mark-btn.active.C { background: #EF4444; color: #fff; }
+
+  .start-btn {
+    width: 100%; padding: 11px; font-size: 14px; font-weight: 700;
+    border: none; border-radius: 10px;
+    background: linear-gradient(135deg, var(--unit-color), var(--unit-color-d));
+    color: #fff; cursor: pointer;
+    box-shadow: 0 3px 10px var(--unit-glow);
+    transition: transform .15s;
+  }
+  .start-btn:hover { transform: scale(1.02); }
+
+  .reset-row { margin-top: 24px; text-align: center; }
+  .reset-btn {
+    padding: 8px 18px; font-size: 12px; border: 1px solid #ddd;
+    background: #fff; color: #999; border-radius: 16px; cursor: pointer;
+  }
+  .reset-btn:hover { color: #EF4444; border-color: #EF4444; }
+  .footer { text-align: center; color: #999; font-size: 12px; margin-top: 20px; padding: 16px; }
+
+  /* ---------- Unit Detail ---------- */
+  .unit-page-header {
+    display: flex; align-items: center; gap: 12px; margin-bottom: 20px;
+    padding: 14px 20px; background: #fff; border-radius: 18px;
+    box-shadow: 0 4px 12px rgba(0,0,0,.06);
+  }
+  .back-btn {
+    padding: 7px 14px; font-size: 14px; border: none; border-radius: 16px;
+    background: #f3f4f6; cursor: pointer; font-weight: 600;
+  }
+  .back-btn:hover { background: #e5e7eb; }
+  .unit-head-info { flex: 1; }
+  .unit-head-name { font-size: 22px; font-weight: 800; color: #111; }
+  .unit-head-meta { font-size: 12px; color: #666; }
+
+  .tabs { display: flex; gap: 6px; margin-bottom: 16px; background: #fff; padding: 6px; border-radius: 14px; }
+  .tab-btn {
+    flex: 1; padding: 10px 0; font-size: 14px; font-weight: 700;
+    border: none; border-radius: 10px; background: transparent;
+    color: #666; cursor: pointer; transition: all .2s;
+  }
+  .tab-btn.active { background: var(--unit-color); color: #fff; }
+
+  .card { background: #fff; border-radius: 16px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,.06); }
+  .card + .card { margin-top: 16px; }
+
+  .intro-box {
+    padding: 14px 18px; background: var(--unit-bg);
+    border-left: 4px solid var(--unit-color);
+    border-radius: 8px; color: #333; line-height: 1.7; font-size: 15px;
+  }
+  .audio-box {
+    background: linear-gradient(135deg, #FEF3C7, #FED7AA);
+    border-radius: 16px; padding: 16px;
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 16px;
+    border: 2px dashed #F59E0B;
+  }
+  .audio-icon { font-size: 32px; }
+  .audio-title { font-weight: 700; font-size: 15px; }
+  .audio-sub { font-size: 13px; color: #78350F; }
+  .audio-btn {
+    padding: 8px 14px; font-size: 13px; border-radius: 16px;
+    border: none; background: #fff; color: #9ca3af; cursor: not-allowed;
+  }
+
+  .card-h { font-size: 18px; font-weight: 800; margin-bottom: 12px; color: var(--unit-color); }
+
+  /* Explanation sections */
+  .explain-section {
+    margin-bottom: 16px; padding: 14px 16px;
+    background: #fafafa; border-radius: 12px;
+    border-left: 3px solid var(--unit-color);
+  }
+  .explain-section:last-child { margin-bottom: 0; }
+  .explain-h { font-size: 16px; font-weight: 700; color: var(--unit-color-d); margin-bottom: 8px; }
+  .explain-p { font-size: 14.5px; line-height: 1.8; color: #333; white-space: pre-wrap; }
+
+  /* Key points — using highlights */
+  .kp-list { margin: 0; padding-left: 0; list-style: none; }
+  .kp-list li {
+    padding: 8px 12px; margin-bottom: 6px; font-size: 14.5px; line-height: 1.6;
+    background: #fff; border-radius: 10px;
+    border-left: 3px solid #e5e7eb;
+  }
+  .kp-list li.star {
+    background: linear-gradient(90deg, #FEF3C7, #fff);
+    border-left-color: #F59E0B;
+    font-weight: 600;
+  }
+  .kp-list li.star2 {
+    background: linear-gradient(90deg, #FEE2E2, #fff);
+    border-left-color: #EF4444;
+    font-weight: 700;
+  }
+  .kp-list li.memorize {
+    background: linear-gradient(90deg, #DBEAFE, #fff);
+    border-left-color: #3B82F6;
+  }
+
+  table.info-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  table.info-table th {
+    padding: 10px 12px; background: var(--unit-color); color: #fff;
+    text-align: left;
+  }
+  table.info-table th:first-child { border-radius: 8px 0 0 0; }
+  table.info-table th:last-child { border-radius: 0 8px 0 0; }
+  table.info-table td { padding: 10px 12px; border-bottom: 1px solid #eee; vertical-align: top; }
+  table.info-table tr:nth-child(even) td { background: var(--unit-bg); }
+
+  .two-btn-row { display: flex; gap: 12px; margin-top: 14px; }
+  .btn-primary {
+    flex: 1; padding: 16px; font-size: 16px; font-weight: 800;
+    border: none; border-radius: 14px; color: #fff; cursor: pointer;
+    background: linear-gradient(135deg, var(--unit-color), var(--unit-color-d));
+    box-shadow: 0 4px 14px var(--unit-glow);
+    transition: transform .15s;
+  }
+  .btn-primary:hover { transform: scale(1.02); }
+  .btn-secondary {
+    flex: 1; padding: 16px; font-size: 16px; font-weight: 800;
+    border-radius: 14px; cursor: pointer;
+    background: #fff; color: var(--unit-color);
+    border: 2px solid var(--unit-color);
+  }
+  .btn-secondary:hover { background: var(--unit-bg); }
+
+  /* ---------- Practice (fill-in blanks) ---------- */
+  .practice-meta {
+    margin-bottom: 12px; padding: 10px 16px; background: #fff;
+    border-radius: 12px; font-size: 13px; color: #666;
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px;
+  }
+  .practice-card {
+    background: #fff; border-radius: 20px; padding: 24px 20px;
+    box-shadow: 0 6px 24px rgba(0,0,0,.08);
+  }
+  .practice-top { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px; color: #666; }
+  .problem-text { font-size: 16.5px; line-height: 2.3; margin-bottom: 20px; white-space: pre-wrap; }
+  .blank {
+    display: inline-block; min-width: 80px; padding: 4px 12px;
+    margin: 0 4px; border-radius: 10px;
+    border: 2px dashed #ccc; background: #fafafa;
+    color: #333; text-align: center; font-weight: 600;
+    cursor: default; transition: all .2s; vertical-align: baseline;
+  }
+  .blank.filled { border: 2px solid #10B981; background: #fff; cursor: pointer; }
+  .blank.correct { background: #D1FAE5; color: #065F46; border-color: #10B981; }
+  .blank.wrong { background: #FEE2E2; color: #991B1B; border-color: #EF4444; animation: shake .4s; }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+  }
+
+  .bank-label { font-size: 13px; color: #888; margin-bottom: 8px; }
+  .bank { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  .bank-word {
+    padding: 8px 14px; font-size: 15px; border: none; border-radius: 20px;
+    cursor: pointer; font-weight: 600;
+    background: linear-gradient(135deg, #A5F3FC, #67E8F9); color: #164E63;
+    box-shadow: 0 2px 6px rgba(0,0,0,.08);
+    transition: all .2s;
+  }
+  .bank-word:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,.12); }
+  .bank-word:disabled {
+    background: #e5e7eb; color: #9ca3af; cursor: not-allowed;
+    opacity: .4; box-shadow: none;
+  }
+
+  .judge-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .judge-btn {
+    padding: 12px 28px; font-size: 16px; font-weight: 700;
+    border: none; border-radius: 30px;
+    background: linear-gradient(135deg, #F59E0B, #EF4444);
+    color: #fff; cursor: pointer;
+    box-shadow: 0 4px 12px rgba(245,158,11,.3);
+  }
+  .judge-btn:disabled { background: #ccc; cursor: not-allowed; box-shadow: none; }
+  .feedback-pass { color: #10B981; font-weight: 700; font-size: 18px; }
+  .feedback-fail { color: #EF4444; font-weight: 700; font-size: 17px; }
+
+  .nav-row { display: flex; gap: 10px; margin-top: 16px; }
+  .nav-btn {
+    padding: 14px; font-size: 15px; font-weight: 700;
+    border-radius: 14px; cursor: pointer; background: #fff;
+  }
+  .nav-btn.prev {
+    flex: 1; color: var(--unit-color); border: 2px solid var(--unit-color);
+  }
+  .nav-btn.prev:disabled { color: #ccc; border-color: #eee; cursor: not-allowed; }
+  .nav-btn.next {
+    flex: 2; color: #fff; border: none;
+    background: linear-gradient(135deg, var(--unit-color), var(--unit-color-d));
+  }
+
+  /* ---------- Quiz ---------- */
+  .quiz-card { background: #fff; border-radius: 20px; padding: 28px; box-shadow: 0 6px 24px rgba(0,0,0,.08); }
+  .quiz-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .quiz-progress-dots { display: flex; gap: 4px; }
+  .quiz-dot { width: 22px; height: 5px; border-radius: 3px; background: #e5e7eb; }
+  .quiz-dot.ok { background: #10B981; }
+  .quiz-dot.ng { background: #EF4444; }
+  .quiz-dot.current { background: #F59E0B; }
+  .quiz-q { font-size: 18px; font-weight: 600; margin-bottom: 20px; line-height: 1.5; }
+  .quiz-choices { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+  .quiz-choice {
+    text-align: left; padding: 14px 18px; font-size: 16px;
+    border: 2px solid #e5e7eb; border-radius: 14px; background: #fff;
+    cursor: pointer; transition: all .15s; font-weight: 500;
+  }
+  .quiz-choice:hover:not(:disabled) { border-color: #F59E0B; }
+  .quiz-choice.selected { border-color: #F59E0B; background: #FEF3C7; font-weight: 700; }
+  .quiz-choice:disabled { cursor: default; }
+  .quiz-choice .num { color: #F59E0B; font-weight: 700; margin-right: 8px; }
+  .quiz-short-input {
+    width: 100%; padding: 14px 18px; font-size: 16px;
+    border: 2px solid #e5e7eb; border-radius: 14px;
+    margin-bottom: 20px; outline: none;
+  }
+  .quiz-short-input:focus { border-color: #F59E0B; }
+  .quiz-submit {
+    padding: 12px 28px; font-size: 16px; font-weight: 700;
+    border: none; border-radius: 24px;
+    background: linear-gradient(135deg, #F59E0B, #EF4444);
+    color: #fff; cursor: pointer;
+  }
+  .quiz-submit:disabled { background: #ccc; cursor: not-allowed; }
+  .quiz-fb-ok { color: #10B981; font-weight: 700; font-size: 17px; margin-bottom: 12px; }
+  .quiz-fb-ng { color: #EF4444; font-weight: 700; font-size: 17px; margin-bottom: 12px; }
+
+  /* Quiz Result */
+  .result-icon { font-size: 52px; margin-bottom: 10px; text-align: center; }
+  .result-score { font-size: 28px; font-weight: 800; margin-bottom: 8px; text-align: center; }
+  .result-score.pass { color: #10B981; }
+  .result-score.fail { color: #F59E0B; }
+  .result-msg { font-size: 16px; color: #666; margin-bottom: 24px; text-align: center; }
+  .result-review {
+    text-align: left; max-height: 280px; overflow: auto;
+    margin-bottom: 20px; padding: 12px; background: #f9fafb; border-radius: 12px;
+  }
+  .result-item { padding: 8px 0; border-bottom: 1px solid #eee; font-size: 14px; }
+  .result-item .wrong-info { color: #EF4444; margin-top: 4px; }
+  .result-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .result-retry {
+    padding: 12px 24px; font-size: 15px; font-weight: 700;
+    border: none; border-radius: 24px; background: #E0E7FF; color: #3730A3; cursor: pointer;
+  }
+  .result-back {
+    padding: 12px 24px; font-size: 15px; font-weight: 700; border: none;
+    border-radius: 24px; background: linear-gradient(135deg, #10B981, #059669);
+    color: #fff; cursor: pointer; box-shadow: 0 4px 12px rgba(16,185,129,.3);
+  }
+  .result-back.neutral {
+    background: #F3F4F6; color: #333; box-shadow: none;
+  }
+
+  /* Confetti */
+  .confetti {
+    position: fixed; top: -20px; width: 12px; height: 12px;
+    z-index: 9999; pointer-events: none;
+  }
+  @keyframes fall { to { transform: translateY(105vh) rotate(720deg); } }
+
+  /* Hidden */
+  .hidden { display: none !important; }
+
+  /* Mobile tweaks */
+  @media (max-width: 520px) {
+    .header { padding: 18px 20px; }
+    .header-title { font-size: 24px; }
+    .container { padding: 12px 10px; }
+    .card { padding: 16px; }
+    .problem-text { font-size: 15.5px; line-height: 2.1; }
+    .quiz-card { padding: 20px 16px; }
+    .grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div id="app"></div>
+
+<!-- Load unit data -->
+<script>
+// ============================================================
+// 単元データ (初めての生徒にもわかりやすい「ですます調」解説)
+// ★マーク = 特に重要なポイント
+// 【暗記】= テストに出る要暗記事項
+// ============================================================
+const UNITS = [
+  {
+    id: 'hydrogen',
+    name: '水素',
+    symbol: 'H',
+    color: '#FF6B9D',
+    colorD: '#E54B7D',
+    bgColor: '#FFE5EE',
+    intro: '宇宙で一番多い元素、それが水素です。燃料電池やロケットの燃料としても使われていて、これからの「クリーンエネルギー」の主役とも言われています。身近では、実は水(H₂O)の中にもたくさん水素が含まれていますね。',
+    explain: [
+      { h: '水素ってどんな元素?', p: '水素Hは元素記号で書くと一番シンプルで、原子番号は1番。周期表の一番左上に住んでいる、すべての元素の「長男」です。地球上では単体(水素ガスH₂)としてはほとんど存在していません。ほとんどが水や有機物の中に「化合物」として隠れています。' },
+      { h: '★ 性質をまず3つ覚えましょう', p: '① 空気より軽い(一番軽い気体です)\n② 水に溶けにくい\n③ 色もにおいもない\nこの3つから、気体を集めるときは「水上置換法(水の中でひっくり返して集める)」を使います。これはとても重要です！' },
+      { h: '作り方(製法)を覚えるコツ', p: '化学では「工業的製法」(大量に作る方法)と「実験室的製法」(学校の理科室で少量作る方法)の2つがあります。\n\n【実験室では】亜鉛Znに希塩酸HClを加える → Zn + 2HCl → ZnCl₂ + H₂↑\nイオン化傾向が水素より大きい金属(ZnやFeなど)は、酸と反応して水素を追い出してくれるのです。\n\n【工業的には】水の電気分解、または高温の水蒸気を鉄・コークス・メタンに当てる方法が使われます。' },
+      { h: '💡 どこで使われているの?', p: '燃料電池自動車(FCV)、ロケットの燃料(液体水素)、アンモニアの合成原料 — 21世紀の「水素社会」の主役候補です。また、金属を還元して取り出す還元剤としても重要で、タングステンWなどの金属はH₂で還元して作られます。' }
+    ],
+    keyPoints: [
+      '【暗記】水素は地球上では単体ではほとんど存在せず、化合物(水など)として存在',
+      '【暗記】空気より軽い・水に溶けにくい → 水上置換で集める',
+      '【暗記】実験室的製法: 亜鉛Zn + 希塩酸HCl → ZnCl₂ + H₂↑',
+      '★ 工業的製法: ①水の電気分解 ②コークス/鉄/メタン + 水蒸気',
+      '水素は燃料電池・ロケット燃料・アンモニア合成に使われる',
+      'イオン化傾向が水素より大きい金属(Zn、Fe、Mgなど)は酸と反応してH₂を発生する'
+    ],
+    table: {
+      title: '水素の製法まとめ',
+      headers: ['分類', '方法', '反応式'],
+      rows: [
+        ['工業', '水の電気分解(陰極)', '2H₂O + 2e⁻ → H₂ + 2OH⁻'],
+        ['工業', 'コークス + 水蒸気', 'C + H₂O → CO + H₂'],
+        ['工業', '鉄 + 水蒸気', '3Fe + 4H₂O → Fe₃O₄ + 4H₂'],
+        ['工業', 'メタン + 水蒸気 (Ni触媒)', 'CH₄ + H₂O → CO + 3H₂'],
+        ['実験室 ★', '亜鉛 + 希塩酸', 'Zn + 2HCl → ZnCl₂ + H₂↑'],
+        ['実験室', '亜鉛 + 希硫酸', 'Zn + H₂SO₄ → ZnSO₄ + H₂↑']
+      ]
+    },
+    fillBlanks: [
+      {
+        text: '水素は宇宙空間で最も多く存在する元素で、地球上では単体としてはほとんど存在せず、水などの{0}として存在します。水素は{1}原子分子 H₂ で、空気より{2}、水に溶け{3}ので、{4}置換で集めます。',
+        answers: ['化合物', '二', '軽く', 'にくい', '水上'],
+        bank: ['化合物', '単体', '二', '三', '軽く', '重く', 'にくい', 'やすい', '水上', '下方', '上方']
+      },
+      {
+        text: '実験室では、亜鉛Znに希塩酸または希硫酸を加えて水素を発生させます。反応式は Zn + 2HCl → {0} + H₂↑ となります。',
+        answers: ['ZnCl₂'],
+        bank: ['ZnCl₂', 'ZnSO₄', 'ZnO', 'Zn(OH)₂']
+      },
+      {
+        text: '水の電気分解(陰極)では、{0}極で水素が発生します。反応式は 2H₂O + 2e⁻ → H₂↑ + {1} となります。陽極では 4OH⁻ → {2}↑ + 2H₂O の反応が起こります。',
+        answers: ['陰', '2OH⁻', 'O₂'],
+        bank: ['陰', '陽', '2OH⁻', '2H⁺', 'O₂', 'H⁺', 'Cl₂']
+      },
+      {
+        text: '赤熱したコークスCに水蒸気を当てると、一酸化炭素COと水素H₂の混合気体が得られます。この混合気体を{0}といいます。反応式は C + H₂O → {1} + H₂ です。この反応は水蒸気を炭素で{2}する反応です。',
+        answers: ['水性ガス', 'CO', '還元'],
+        bank: ['水性ガス', '都市ガス', 'LPガス', 'CO', 'CO₂', 'H₂O', '酸化', '還元', '中和']
+      },
+      {
+        text: '赤熱した鉄Feに水蒸気を当てると、鉄が酸化し、水が還元されて水素が発生します。反応式は 3Fe + {0}H₂O → {1} + 4H₂ となります。生成物 Fe₃O₄ の物質名は{2}です。',
+        answers: ['4', 'Fe₃O₄', '四酸化三鉄'],
+        bank: ['2', '3', '4', '6', 'FeO', 'Fe₂O₃', 'Fe₃O₄', '酸化鉄', '四酸化三鉄', '三酸化二鉄']
+      },
+      {
+        text: 'メタンCH₄に高温の水蒸気を{0}触媒を用いて反応させると、水性ガスが発生します。反応式は CH₄ + H₂O → CO + {1}H₂ となります。',
+        answers: ['Ni', '3'],
+        bank: ['Ni', 'Pt', 'Fe', 'Cu', '1', '2', '3', '4']
+      },
+      {
+        text: '水素はイオン化傾向が水素より{0}金属(Zn、Fe、Mgなど)と酸の反応で発生します。一方、Cu・Ag・Auなどのイオン化傾向が水素より{1}金属では、希塩酸・希硫酸と反応{2}水素を発生しません。',
+        answers: ['大きい', '小さい', 'せず'],
+        bank: ['大きい', '小さい', 'せず', 'して', '同じで']
+      }
+    ],
+    quiz: [
+      { type: 'mc', q: '水素の性質として正しいものはどれですか?', choices: ['空気より重い', '水によく溶ける', '空気より軽く水に溶けにくい', '有色である'], ans: 2 },
+      { type: 'mc', q: '水素を実験室で発生させる方法として適切なものはどれですか?', choices: ['銅に濃硝酸', '亜鉛に希塩酸', '石灰石に塩酸', '塩化アンモニウムと水酸化カルシウム'], ans: 1 },
+      { type: 'mc', q: '水素を集める方法として最も適切なのはどれですか?', choices: ['下方置換', '上方置換', '水上置換', '加熱置換'], ans: 2 },
+      { type: 'short', q: '「水性ガス」とは何と何の混合気体ですか? (2つ答える、スペース区切り)', ans: ['CO H₂', 'H₂ CO', 'co h2', 'h2 co'] },
+      { type: 'mc', q: 'メタンに高温水蒸気を作用させるとき用いる触媒は?', choices: ['白金Pt', 'ニッケルNi', '四酸化三鉄Fe₃O₄', '酸化マンガンMnO₂'], ans: 1 },
+      { type: 'mc', q: '水の電気分解で陽極に発生する気体はどれですか?', choices: ['水素H₂', '酸素O₂', '塩素Cl₂', '二酸化炭素CO₂'], ans: 1 },
+      { type: 'mc', q: '赤熱したコークスに水蒸気を当てる反応で、コークス(炭素)はどのようなはたらきをしていますか?', choices: ['酸化剤', '還元剤', '触媒', '中和剤'], ans: 1 },
+      { type: 'short', q: 'Fe₃O₄ の物質名(漢字)を書いてください。', ans: ['四酸化三鉄', 'しさんかさんてつ'] },
+      { type: 'mc', q: '次のうち希塩酸と反応して水素を発生しない金属はどれですか?', choices: ['亜鉛Zn', '鉄Fe', '銅Cu', 'マグネシウムMg'], ans: 2 }
+    ]
+  },
+
+  {
+    id: 'noble_gas',
+    name: '希ガス',
+    symbol: 'He',
+    color: '#A78BFA',
+    colorD: '#8B5CF6',
+    bgColor: '#EDE9FE',
+    intro: '空気の中にほんの少しだけ含まれている希ガス。ヘリウムHeは風船に、ネオンNeはネオンサインに、アルゴンArは電球の封入ガスに — 実は身近なところでひそかに活躍しています。',
+    explain: [
+      { h: '希ガスは「化学反応をしない仲良しグループ」', p: '希ガスは周期表の18族に住んでいる6つの元素(He、Ne、Ar、Kr、Xe、Rn)のことです。この仲間たちは電子配置がとても安定していて、ほとんど他の元素と反応しません。「一匹オオカミ」と言われることもありますよ。' },
+      { h: '★ なぜ反応しないの?', p: '化学の秘密をひとつ教えます。原子は「電子を8個(またはHeは2個)持って安定したい」という性質があります。これを「オクテット則」と呼びます。希ガスはすでに電子が8個(Heは2個)あり、すでに大満足の状態。だから他の元素と結合する必要がないのです。\n→ 価電子は0個(結合に使う電子がない)、単原子分子(ひとりで存在)として空気中にわずかに存在します。' },
+      { h: '💡 覚え方のコツ(語呂合わせ)', p: '「変な(He) ねーちゃん(Ne) ある(Ar)いて(何も意味なし) くる(Kr)よ(Xe) くせ(...Xeの延長) 乱発(Rn)」\n先輩方が昔から使っている語呂です。He・Ne・Ar・Kr・Xe・Rnの順に覚えましょう。' },
+      { h: '身近な使われ方', p: '【He】水素の次に軽くて不燃性 → 風船、飛行船、MRIの冷却剤(液体He)\n【Ne】放電すると赤色に光る → ネオンサイン\n【Ar】化学的に不活性 → 電球の中に入れてタングステンフィラメントを守る、アルゴン溶接\n【Kr】電球の封入ガス\n【Xe】キセノンランプ(自動車のヘッドライト)\n【Rn】放射性元素 → 医療用の放射線源' }
+    ],
+    keyPoints: [
+      '【暗記】周期表18族、価電子0個 → きわめて安定で化合物をほとんど作らない',
+      '【暗記】単体は単原子分子として気体で存在',
+      '★ ヘリウムHe: 水素に次いで軽く、不燃性 → 風船・飛行船・冷却材',
+      '★ アルゴンAr: 電球・蛍光灯の封入ガス、アルゴン溶接',
+      'ネオンNe: ネオンサイン (放電で赤色に光る)',
+      'キセノンXe: キセノンランプ、自動車のヘッドライト',
+      '【語呂】「変な ねーちゃん ある いて くるよ くせ 乱発」He Ne Ar Kr Xe Rn'
+    ],
+    table: {
+      title: '希ガスの覚え方と用途',
+      headers: ['記号', '名前', '主な用途'],
+      rows: [
+        ['He', 'ヘリウム', '風船・飛行船・冷却材(液体He)'],
+        ['Ne', 'ネオン', 'ネオンサイン'],
+        ['Ar', 'アルゴン', '電球の封入ガス・アルゴン溶接'],
+        ['Kr', 'クリプトン', '電球の封入ガス'],
+        ['Xe', 'キセノン', 'キセノンランプ'],
+        ['Rn', 'ラドン', '(放射性)医療用放射線源']
+      ]
+    },
+    fillBlanks: [
+      {
+        text: '希ガスは周期表の{0}族で、価電子が{1}個のためほとんど化合物をつくりません。単体は{2}分子として空気中にわずかに存在します。',
+        answers: ['18', '0', '単原子'],
+        bank: ['17', '18', '0', '1', '単原子', '二原子', '多原子']
+      },
+      {
+        text: 'ヘリウムHeは水素に次いで{0}、{1}性なので飛行船や風船に使われます。アルゴンArは{2}の封入ガスや{3}に利用されます。',
+        answers: ['軽く', '不燃', '電球', 'アルゴン溶接'],
+        bank: ['軽く', '重く', '不燃', '可燃', '電球', 'LED', 'アルゴン溶接', '半田']
+      },
+      {
+        text: '希ガスの最外殻電子の数は、Heだけが{0}個で、Ne・Ar・Kr・Xe・Rnはすべて{1}個です。この「安定な電子配置」のため、反応性が非常に{2}のが特徴です。',
+        answers: ['2', '8', '低い'],
+        bank: ['2', '4', '8', '7', '高い', '低い']
+      },
+      {
+        text: '希ガスのうち、空気より重いものは Ar・{0}・{1} です。気体の分子量は He={2}、Ne=20、Ar={3} で、空気の平均分子量は 29 です。',
+        answers: ['Xe', 'Rn', '4', '40'],
+        bank: ['He', 'Ne', 'Ar', 'Kr', 'Xe', 'Rn', '4', '20', '40', '84']
+      },
+      {
+        text: '大気中に最も多く含まれる希ガスは{0}です。沸点が最も低い希ガスは{1}で、液体ヘリウムは MRI などの{2}材として利用されます。',
+        answers: ['Ar', 'He', '冷却'],
+        bank: ['He', 'Ne', 'Ar', 'Xe', '冷却', '加熱', '溶接']
+      },
+      {
+        text: '希ガスの利用をまとめます。ネオンサインに使うのは{0}、電球・蛍光灯の封入ガスは{1}、ストロボや自動車のヘッドライトに使うのは{2}、風船や飛行船に使うのは{3}です。',
+        answers: ['Ne', 'Ar', 'Xe', 'He'],
+        bank: ['He', 'Ne', 'Ar', 'Kr', 'Xe', 'Rn']
+      }
+    ],
+    quiz: [
+      { type: 'mc', q: '希ガスの原子の価電子の数はいくつですか?', choices: ['0個', '1個', '7個', '8個'], ans: 0 },
+      { type: 'mc', q: 'ヘリウムは地球上でどのような状態で存在しますか?', choices: ['固体', '液体', '気体', '化合物'], ans: 2 },
+      { type: 'mc', q: '電球の封入ガスとして使われる希ガスはどれですか?', choices: ['He', 'Ne', 'Ar', 'Rn'], ans: 2 },
+      { type: 'mc', q: 'ネオンサインに使われる元素はどれですか?', choices: ['He', 'Ne', 'Ar', 'Xe'], ans: 1 },
+      { type: 'short', q: 'ラドンは何として利用されていますか? (漢字)', ans: ['医療用放射線源', '放射線源', '放射能源'] },
+      { type: 'mc', q: '希ガスの記述として誤っているものはどれですか?', choices: ['単体はすべて単原子分子である', '大気中に最も多く存在する希ガスはヘリウムである', 'ヘリウムは空気より軽い', 'アルゴンは電球の封入ガスに用いられる'], ans: 1 },
+      { type: 'mc', q: '希ガスのうち沸点が最も低いのはどれですか?', choices: ['He', 'Ne', 'Ar', 'Xe'], ans: 0 },
+      { type: 'mc', q: '次のうち空気より軽い希ガスはどれですか?', choices: ['Ar', 'Kr', 'Xe', 'He'], ans: 3 },
+      { type: 'mc', q: 'アルゴン溶接でArを用いる主な理由はどれですか?', choices: ['熱を早く伝えるため', '金属の酸化を防ぐため', '発光を利用するため', '溶接部を冷却するため'], ans: 1 },
+      { type: 'short', q: '「変な ねーちゃん あるいて くるよ くせ 乱発」の覚え方で、3番目にくる希ガスの元素記号を答えてください。', ans: ['Ar', 'ar'] }
+    ]
+  },
+
+  {
+    id: 'halogen',
+    name: 'ハロゲン',
+    symbol: 'Cl',
+    color: '#10B981',
+    colorD: '#059669',
+    bgColor: '#D1FAE5',
+    intro: '周期表17族のハロゲン。塩素Cl₂は水道水の殺菌に、フッ素Fは歯磨き粉に、ヨウ素Iはうがい薬に — 私たちの生活を支える大切な元素たちです。',
+    explain: [
+      { h: 'ハロゲンは「塩をつくる仲間」', p: '「ハロゲン」という名前は、ギリシャ語で「塩(halos)をつくる(genes)」という意味。ナトリウムと結びついて食塩NaClをつくる、というイメージからきています。仲間は F(フッ素)、Cl(塩素)、Br(臭素)、I(ヨウ素) の4つです。' },
+      { h: '★ ハロゲンは電子をほしがる!', p: 'ハロゲンは価電子を7個もっています。あと1個もらえば希ガスと同じ安定な電子配置! だから「電子を1個もらって1価の陰イオン(X⁻)になる」性質があります。これはとても重要なポイントです。\n\n例: Cl + e⁻ → Cl⁻' },
+      { h: '★ 酸化力と沸点の順序を覚えよう', p: '【酸化力(電子を奪う力)】F₂ > Cl₂ > Br₂ > I₂\n→ 原子番号が小さいほど強い! \n\n【融点・沸点・色の濃さ】F₂ < Cl₂ < Br₂ < I₂\n→ 原子番号が大きいほど高い!\n\n常温での状態も、F₂とCl₂は気体、Br₂は液体、I₂は固体と変化します。この順序は必ず覚えましょう。' },
+      { h: '💡 塩素Cl₂ の作り方', p: '【実験室】酸化マンガン(Ⅳ)MnO₂に濃塩酸を加えて加熱\nMnO₂ + 4HCl → MnCl₂ + 2H₂O + Cl₂↑\n\n【工業】食塩水の電気分解 — 同時に水酸化ナトリウムと水素もできる一石三鳥の反応です。\n\n塩素は水に少し溶けるので「下方置換(空気より重いため)」で集めます。水道水の消毒には塩素が使われていますね。' },
+      { h: '★ フッ化水素HFの特別な性質', p: 'HF・HCl・HBr・HI のうち、HFだけが変わり者なんです。\n\n① HFは「弱酸」(他は強酸)\n② HFの沸点だけ異常に高い → 分子間に「水素結合」がはたらくから\n③ HFはガラス(SiO₂)を溶かす → だからガラス瓶では保存できない! ポリエチレン容器に入れます。\n\nSiO₂ + 6HF → H₂SiF₆ + 2H₂O' },
+      { h: 'さらし粉・高度さらし粉', p: '水道水の消毒や漂白剤として使われる「さらし粉 CaCl(ClO)·H₂O」と「高度さらし粉 Ca(ClO)₂·2H₂O」。塩素Cl₂を水酸化カルシウム(消石灰)に吸収させて作ります。\n酸を加えると塩素が発生: Ca(ClO)₂·2H₂O + 4HCl → CaCl₂ + 2Cl₂↑ + 4H₂O' }
+    ],
+    keyPoints: [
+      '【暗記】ハロゲン(F, Cl, Br, I)は価電子7個 → 1価の陰イオンX⁻になりやすい',
+      '★★ 酸化力: F₂ > Cl₂ > Br₂ > I₂ (原子番号小さいほど強い)',
+      '★★ 融点・沸点: F₂ < Cl₂ < Br₂ < I₂ (原子番号大きいほど高い)',
+      '【暗記】常温: F₂(気)・Cl₂(気)・Br₂(液)・I₂(固)',
+      '★ HFだけは弱酸! 分子間の水素結合で沸点が異常に高い',
+      '★ HFはガラスを溶かす → ポリエチレン容器で保存',
+      '【暗記】Cl₂実験室: MnO₂ + 濃塩酸を加熱',
+      '【暗記】Cl₂工業: 食塩水の電気分解',
+      '【暗記】AgF は水に溶ける、AgCl(白)・AgBr(淡黄)・AgI(黄)は水に溶けにくい(写真感光剤)'
+    ],
+    table: {
+      title: 'ハロゲン単体の性質比較',
+      headers: ['単体', '色', '常温での状態', '酸化力', '水との反応'],
+      rows: [
+        ['F₂', '淡黄色', '気体', '最強 ★', '激しく反応(O₂発生)'],
+        ['Cl₂', '黄緑色', '気体', '強', '一部反応(HCl+HClO生成)'],
+        ['Br₂', '赤褐色', '液体', '中', '少し溶ける'],
+        ['I₂', '黒紫色', '固体', '弱', 'ほとんど溶けない(KI水溶液には溶ける)']
+      ]
+    },
+    fillBlanks: [
+      {
+        text: 'ハロゲン元素は価電子を{0}個もち、電子1個を受け取って{1}価の{2}イオンになりやすいです。酸化力は F₂ {3} Cl₂ {3} Br₂ {3} I₂ の順に強くなります。',
+        answers: ['7', '1', '陰', '>'],
+        bank: ['7', '8', '1', '2', '陰', '陽', '>', '<', '=']
+      },
+      {
+        text: '塩素の実験室的製法では、酸化マンガン(Ⅳ)MnO₂に{0}を加えて加熱します。\nMnO₂ + 4HCl → {1} + 2H₂O + Cl₂↑',
+        answers: ['濃塩酸', 'MnCl₂'],
+        bank: ['濃塩酸', '希塩酸', '濃硫酸', 'MnCl₂', 'MnSO₄', 'MnO']
+      },
+      {
+        text: 'フッ化水素HFは、他のハロゲン化水素と異なり{0}酸で、{1}結合により沸点が{2}です。ガラスの主成分{3}を溶かすため、{4}容器で保存します。',
+        answers: ['弱', '水素', '高い', 'SiO₂', 'ポリエチレン'],
+        bank: ['弱', '強', '水素', 'イオン', '金属', '高い', '低い', 'SiO₂', 'CaCO₃', 'ポリエチレン', 'ガラス']
+      },
+      {
+        text: 'さらし粉の主成分はCaCl(ClO)·H₂O、{0}粉は Ca(ClO)₂·2H₂O です。これらは{1}・{2}作用があり、水道水やプールの消毒に使われます。',
+        answers: ['高度さらし', '漂白', '殺菌'],
+        bank: ['高度さらし', 'ベーキング', '漂白', '乾燥', '殺菌', '保湿']
+      }
+    ],
+    quiz: [
+      { type: 'mc', q: 'ハロゲン単体の酸化力の順序として正しいものはどれですか?', choices: ['F₂<Cl₂<Br₂<I₂', 'F₂>Cl₂>Br₂>I₂', 'Cl₂>F₂>Br₂>I₂', 'すべて同じ'], ans: 1 },
+      { type: 'mc', q: '常温で液体のハロゲン単体はどれですか?', choices: ['F₂', 'Cl₂', 'Br₂', 'I₂'], ans: 2 },
+      { type: 'mc', q: '塩素の工業的製法はどれですか?', choices: ['MnO₂に濃塩酸を加熱', '食塩水の電気分解', '塩化水素の酸化', 'さらし粉と塩酸'], ans: 1 },
+      { type: 'mc', q: 'ハロゲン化銀のうち水に溶けるものはどれですか?', choices: ['AgCl', 'AgBr', 'AgI', 'AgF'], ans: 3 },
+      { type: 'mc', q: 'HFの沸点が他のハロゲン化水素より異常に高い理由はどれですか?', choices: ['分子量が大きい', '水素結合による分子間結合', 'イオン結合性が強い', 'すべての異性体が混在'], ans: 1 },
+      { type: 'short', q: 'ヨウ素デンプン反応で出る色は何色ですか?', ans: ['青紫', '青紫色', '青'] },
+      { type: 'mc', q: '塩素と水の反応で生じる、漂白・殺菌作用をもつ物質はどれですか?', choices: ['HCl', 'HClO', 'HClO₄', 'NaCl'], ans: 1 }
+    ]
+  },
+
+  {
+    id: 'oxygen',
+    name: '酸素',
+    symbol: 'O',
+    color: '#3B82F6',
+    colorD: '#2563EB',
+    bgColor: '#DBEAFE',
+    intro: '空気の21%を占める酸素。私たちの呼吸に欠かせない、まさに命の元素です。オゾン層は太陽からの紫外線を吸収し、私たち生物を守ってくれています。',
+    explain: [
+      { h: '酸素は「燃焼」の主役', p: '酸素O₂は周期表16族で、価電子は6個。あと2個もらって8個になりたいので、2価の陰イオンO²⁻になりやすい元素です。空気中に体積で約21%含まれる、無色・無臭の気体です。' },
+      { h: '★ 酸素O₂とオゾンO₃は「同素体」', p: '同じ酸素元素だけでできているのに、性質がまったく違う物質が2つ存在します。これを「同素体」と呼びます。\n\n【O₂】無色・無臭、呼吸に必要、直線型\n【O₃】淡青色・特異臭(生臭い)・有毒、折れ線型、強い酸化力\n\n他に同素体のある元素は S, C, P などがあります(「SCOP(スコップ)」で覚えましょう)。' },
+      { h: '製法を整理しましょう', p: '【実験室】2つの方法があります。どちらも酸化マンガン(Ⅳ)MnO₂が触媒として登場するのがポイント!\n① 2H₂O₂ → 2H₂O + O₂ (過酸化水素 + MnO₂触媒)\n② 2KClO₃ → 2KCl + 3O₂ (塩素酸カリウム + MnO₂触媒、加熱)\n\n【工業】液体空気の分留\n空気を冷やして液体にし、沸点の違いで窒素と酸素を分けます。' },
+      { h: '★ オゾンの検出方法 — 超重要!', p: '湿らせたヨウ化カリウムKIデンプン紙にオゾンO₃を吹きつけると、青紫色に変化します。これはオゾンの強い酸化力がKIをI₂にし、それがデンプンと反応するためです。\n\nO₃ + 2KI + H₂O → O₂ + I₂ + 2KOH\n\nオゾンは漂白・殺菌作用があり、空気中で加熱しても酸化されない銀Agも酸化できます。' },
+      { h: '酸化物の3分類', p: '酸素と他の元素がくっついた化合物が「酸化物」です。性質で3つに分けられます。\n\n【酸性酸化物】非金属元素の酸化物 (SO₃, CO₂, P₄O₁₀など)\n→ 水に溶けると酸性を示します\n\n【塩基性酸化物】金属元素の酸化物 (Na₂O, CaOなど)\n→ 水に溶けると塩基性を示します\n\n【両性酸化物 ★】両性元素(Al, Zn, Sn, Pb)の酸化物\n→ 酸とも塩基とも反応します\n覚え方: 「あ・あ・すん・なり 酸・塩基(アルカリ)」' },
+      { h: '💡 オキソ酸の強弱', p: 'オキソ酸(分子中に酸素を含む酸)の強さは、分子中の酸素原子が多いほど強酸!\n\nHClO < HClO₂ < HClO₃ < HClO₄\n次亜塩素酸 < 亜塩素酸 < 塩素酸 < 過塩素酸\n\n同じように HNO₂ < HNO₃、H₂SO₃ < H₂SO₄ となります。' }
+    ],
+    keyPoints: [
+      '【暗記】周期表16族、価電子6個 → 2価の陰イオン O²⁻',
+      '【暗記】空気中に体積で約21%、無色・無臭の気体',
+      '★★ 酸素O₂とオゾンO₃は同素体(同じ元素・違う性質)',
+      '【暗記】実験室的製法①: 2H₂O₂ → 2H₂O + O₂ (MnO₂触媒)',
+      '【暗記】実験室的製法②: 2KClO₃ → 2KCl + 3O₂ (MnO₂触媒、加熱)',
+      '【暗記】工業的製法: 液体空気の分留',
+      '★ オゾンは淡青色・特異臭・有毒、強い酸化作用(漂白・殺菌)',
+      '★★ オゾンの検出: 湿らせたヨウ化カリウムデンプン紙 → 青紫色に変化',
+      '★ 酸化物の分類: 酸性(非金属)・塩基性(金属)・両性(Al・Zn・Sn・Pb)',
+      '★ オキソ酸: 酸素が多いほど強酸 (HClO < HClO₂ < HClO₃ < HClO₄)'
+    ],
+    table: {
+      title: '酸素とオゾンの比較',
+      headers: ['', '酸素 O₂', 'オゾン O₃'],
+      rows: [
+        ['分子の形', '直線型', '折れ線型'],
+        ['色', '無色', '淡青色'],
+        ['臭い', '無臭', '特異臭'],
+        ['製法', 'H₂O₂にMnO₂/KClO₃加熱', '酸素中で無声放電 or 紫外線'],
+        ['特徴', '空気中に21%、呼吸に使用', '強い酸化作用、漂白・殺菌']
+      ]
+    },
+    fillBlanks: [
+      {
+        text: '酸素は空気中に体積で約{0}%存在する、無色・無臭の気体です。工業的には{1}空気の{2}で得られ、実験室では過酸化水素水に触媒として{3}を加えて得ます。',
+        answers: ['21', '液体', '分留', 'MnO₂'],
+        bank: ['21', '78', '99', '液体', '固体', '分留', '蒸留', 'MnO₂', 'Fe₃O₄', 'Pt']
+      },
+      {
+        text: 'オゾンO₃は酸素中で{0}を行うか、{1}を当てると生じます。{2}色で{3}臭があり、強い{4}作用をもちます。湿らせたヨウ化カリウムデンプン紙を{5}色に変えることで検出できます。',
+        answers: ['無声放電', '紫外線', '淡青', '特異', '酸化', '青紫'],
+        bank: ['無声放電', '加熱', '紫外線', '赤外線', '淡青', '黄緑', '特異', '無', '酸化', '還元', '青紫', '赤褐']
+      },
+      {
+        text: '酸化物は3種類に分類されます。非金属元素の酸化物は{0}酸化物、金属元素の酸化物は{1}酸化物、Al・Zn・Sn・Pbなど両性元素の酸化物は{2}酸化物とよばれ、{3}とも{4}とも反応します。',
+        answers: ['酸性', '塩基性', '両性', '酸', '塩基'],
+        bank: ['酸性', '塩基性', '両性', '中性', '酸', '塩基', '水']
+      }
+    ],
+    quiz: [
+      { type: 'mc', q: '酸素O₂の実験室的製法として正しいものはどれですか?', choices: ['2H₂O₂ → 2H₂O + O₂ (MnO₂触媒)', 'N₂ + O₂ → 2NO', '3O₂ → 2O₃', 'CaCO₃ → CaO + CO₂'], ans: 0 },
+      { type: 'mc', q: 'オゾンの検出に使うのはどれですか?', choices: ['青色リトマス紙', 'ヨウ化カリウムデンプン紙', 'フェノールフタレイン液', 'BTB溶液'], ans: 1 },
+      { type: 'mc', q: 'オゾンがヨウ化カリウムデンプン紙を変化させる色は何色ですか?', choices: ['赤', '黄', '青紫', '緑'], ans: 2 },
+      { type: 'mc', q: '両性酸化物でないものはどれですか?', choices: ['Al₂O₃', 'ZnO', 'SnO', 'Na₂O'], ans: 3 },
+      { type: 'short', q: '酸素とオゾンのように、同じ元素からなる性質の異なる単体を何といいますか?', ans: ['同素体'] },
+      { type: 'mc', q: 'オキソ酸の強さの順として正しいのはどれですか?', choices: ['HClO > HClO₂ > HClO₃ > HClO₄', 'HClO < HClO₂ < HClO₃ < HClO₄', 'すべて等しい', '予測不能'], ans: 1 }
+    ]
+  },
+
+  {
+    id: 'sulfur',
+    name: '硫黄',
+    symbol: 'S',
+    color: '#F59E0B',
+    colorD: '#D97706',
+    bgColor: '#FEF3C7',
+    intro: '温泉の香りでおなじみの硫黄。硫酸H₂SO₄は「化学工業の米」とも呼ばれるほど重要な物質です。肥料・洗剤・薬品など、本当にたくさんのものに使われています。',
+    explain: [
+      { h: '硫黄には3つの顔がある — 同素体', p: '硫黄Sには3種類の同素体があります。\n\n【斜方硫黄】常温で一番安定。黄色の固体。S₈ (8つのS原子が環状に結合)\n【単斜硫黄】針状結晶。斜方硫黄を加熱するとできる。S₈\n【ゴム状硫黄】弾力性あり。急冷するとできる。結晶構造はもたない。\n\n斜方硫黄と単斜硫黄はS₈分子ですが、ゴム状硫黄は構造が違うので二硫化炭素CS₂に溶けません。' },
+      { h: '★ 二酸化硫黄SO₂ — 漂白剤の主役', p: 'SO₂は刺激臭のある無色の有毒な気体。水に溶けて亜硫酸H₂SO₃(弱酸)になります。紙や繊維の漂白に使われています。\n\n【実験室的製法】\n① Cu + 2H₂SO₄(熱濃) → CuSO₄ + SO₂↑ + 2H₂O\n② Na₂SO₃ + H₂SO₄ → Na₂SO₄ + SO₂↑ + H₂O\n\nSO₂は通常は還元剤ですが、相手がより強い還元剤(H₂Sなど)だと酸化剤になります。これは少しややこしいので要注意!' },
+      { h: '★ 硫化水素H₂S — 「腐った卵」のにおい', p: 'H₂Sは腐卵臭(腐った卵のにおい)のある有毒な気体です。水に溶けて弱酸性を示します。強い還元剤としても働きます。\n\n【とても重要】多くの金属イオンと反応して硫化物の沈殿をつくります。これは金属イオンを分離するときにとても大事!\nCuS(黒)、PbS(黒)、ZnS(白)、FeS(黒)、CdS(黄)、MnS(淡桃)、AgS(黒)' },
+      { h: '★★ 濃硫酸H₂SO₄の4つの性質 — 超重要!', p: '濃硫酸には4つの大きな性質があります。これは絶対覚えましょう!\n\n① 不揮発性 — 沸点が高い(約330℃)。揮発性の酸を追い出す反応に利用。\n  例: NaCl + H₂SO₄ → NaHSO₄ + HCl↑\n\n② 吸湿性 — 水分をよく吸う → 乾燥剤として使用 (NH₃とH₂Sには使えません!)\n\n③ 脱水作用 — 物質からHとOを水分子H₂Oの形で奪う\n  例: スクロース C₁₂H₂₂O₁₁ → 12C + 11H₂O (砂糖が黒くなる実験)\n\n④ 熱濃硫酸の酸化作用 — 銅や銀など(水素より小さいイオン化傾向の金属)を溶かす\n  例: Cu + 2H₂SO₄(熱濃) → CuSO₄ + SO₂↑ + 2H₂O' },
+      { h: '希硫酸は「ふつうの強酸」', p: '薄い硫酸(希硫酸)は、単なる強酸として働きます。イオン化傾向が水素より大きい金属(Zn, Feなど)と反応して水素を発生します。\n例: Zn + H₂SO₄(希) → ZnSO₄ + H₂↑' },
+      { h: '💡 硫酸の工業的製法 — 接触式硫酸製造法', p: '工業的には「接触式硫酸製造法」でつくります。V₂O₅(五酸化バナジウム)という触媒を使うのがポイント!\n\n① S + O₂ → SO₂ (硫黄を燃やす)\n② 2SO₂ + O₂ → 2SO₃ (V₂O₅触媒で酸化)\n③ SO₃ + H₂O → H₂SO₄ (水と反応 — 実際には濃硫酸に吸収させる)\n\n全体: 2S + 3O₂ + 2H₂O → 2H₂SO₄' }
+    ],
+    keyPoints: [
+      '【暗記】硫黄の同素体: 斜方硫黄(常温安定)・単斜硫黄(針状)・ゴム状硫黄',
+      '★ 斜方硫黄・単斜硫黄はS₈分子 (環状構造)',
+      '【暗記】SO₂実験室製法: Cu + 熱濃硫酸 / Na₂SO₃ + 希硫酸',
+      '★ SO₂は還元性(漂白剤)、ただしH₂S相手だと酸化剤に',
+      '【暗記】H₂Sは腐卵臭・還元性・弱酸、多くの金属イオンと硫化物沈殿',
+      '★★ 濃硫酸の4大性質: ①不揮発性 ②吸湿性 ③脱水作用 ④熱濃硫酸の酸化作用',
+      '【暗記】希硫酸は強酸 (水素よりイオン化傾向が大きい金属と H₂ 発生)',
+      '★★ 硫酸の工業的製法: 接触式硫酸製造法 (触媒V₂O₅)'
+    ],
+    table: {
+      title: '濃硫酸の4つの性質',
+      headers: ['性質', '具体例・反応'],
+      rows: [
+        ['① 不揮発性', 'NaCl + H₂SO₄ → NaHSO₄ + HCl↑ (揮発性の酸を追い出す)'],
+        ['② 吸湿性', '乾燥剤として使用(NH₃とH₂Sには使えない!)'],
+        ['③ 脱水作用 ★', 'スクロース C₁₂H₂₂O₁₁ → 12C + 11H₂O (黒くなる)'],
+        ['④ 熱濃硫酸の酸化作用 ★', 'Cu + 2H₂SO₄ → CuSO₄ + SO₂ + 2H₂O'],
+        ['希硫酸の強酸性', 'Zn + H₂SO₄ → ZnSO₄ + H₂↑']
+      ]
+    },
+    fillBlanks: [
+      {
+        text: '硫黄の同素体には、常温で安定な{0}、針状結晶の{1}、弾力性のある{2}があります。このうち{0}と{1}は{3}個の硫黄原子が環状に結合した分子からなります。',
+        answers: ['斜方硫黄', '単斜硫黄', 'ゴム状硫黄', '8'],
+        bank: ['斜方硫黄', '単斜硫黄', 'ゴム状硫黄', '黒色硫黄', '8', '6', '10']
+      },
+      {
+        text: '二酸化硫黄SO₂は{0}臭の無色気体で、水に溶けて{1}酸を生じます。還元剤として{2}作用があり、紙や繊維の{3}に使われます。銅に濃硫酸を加えて加熱すると得られ、反応式は\nCu + 2H₂SO₄ → {4} + SO₂ + 2H₂O',
+        answers: ['刺激', '弱', '還元', '漂白', 'CuSO₄'],
+        bank: ['刺激', '腐卵', '弱', '強', '還元', '酸化', '漂白', '殺菌', 'CuSO₄', 'CuCl₂', 'CuO']
+      },
+      {
+        text: '濃硫酸は{0}・{1}・{2}作用をもちます。スクロース(砂糖)に濃硫酸を滴下すると炭素が遊離して{3}くなるのは{1}作用によるものです。熱濃硫酸は強い{4}作用をもち、銅と反応してSO₂を発生します。',
+        answers: ['不揮発性', '脱水', '吸湿', '黒', '酸化'],
+        bank: ['不揮発性', '揮発性', '脱水', '吸湿', '中和', '黒', '白', '酸化', '還元']
+      },
+      {
+        text: '硫酸の工業的製法は{0}式硫酸製造法といいます。硫黄を燃やしてSO₂を作り、触媒{1}を用いてSO₃にし、これを濃硫酸に吸収させて{2}硫酸にし、薄めて濃硫酸とします。',
+        answers: ['接触', 'V₂O₅', '発煙'],
+        bank: ['接触', '接触式', 'ハーバー・ボッシュ', 'オストワルト', 'V₂O₅', 'Pt', 'Fe₃O₄', '発煙', '三酸化二']
+      }
+    ],
+    quiz: [
+      { type: 'mc', q: '硫黄の同素体のうち常温で安定なのはどれですか?', choices: ['単斜硫黄', '斜方硫黄', 'ゴム状硫黄', '黒色硫黄'], ans: 1 },
+      { type: 'mc', q: '硫化水素H₂Sのにおいはどれですか?', choices: ['刺激臭', '腐卵臭', '青草臭', '無臭'], ans: 1 },
+      { type: 'mc', q: '濃硫酸がスクロースを黒くするのは何作用ですか?', choices: ['吸湿作用', '脱水作用', '酸化作用', '中和作用'], ans: 1 },
+      { type: 'mc', q: '銅に希硫酸を加えても水素が発生しないのはなぜですか?', choices: ['銅が希硫酸と反応しないため (イオン化傾向が水素より小さい)', '銅が希硫酸を吸収するため', '希硫酸が酸化剤として働くため', '銅が不動態を作るため'], ans: 0 },
+      { type: 'short', q: '硫酸の工業的製法(接触式硫酸製造法)で使われる触媒の化学式は?', ans: ['V₂O₅'] },
+      { type: 'mc', q: '硫酸工業で、SO₃を吸収させるのに使うのはどれですか?', choices: ['水', '濃硫酸', '希硫酸', '塩酸'], ans: 1 },
+      { type: 'mc', q: '濃硫酸を乾燥剤として使えない気体はどれですか?', choices: ['CO₂', 'Cl₂', 'NH₃', 'O₂'], ans: 2 }
+    ]
+  },
+
+  {
+    id: 'nitrogen',
+    name: '窒素',
+    symbol: 'N',
+    color: '#8B5CF6',
+    colorD: '#7C3AED',
+    bgColor: '#EDE9FE',
+    intro: '空気の78%を占める窒素。ふだんは静かに存在していますが、アンモニアや硝酸になると大活躍! 肥料・火薬・染料の原料となり、生命の材料(タンパク質・DNA)にも含まれます。',
+    explain: [
+      { h: '窒素N₂は「ひとり静かな元素」', p: '空気の78%を占めている窒素N₂は、三重結合N≡Nでしっかり結びついていて、常温では反応性がとても低い元素です。「不活性ガス」として食品の保存にも使われますね(ポテトチップスの袋の中に充填されています)。\n\n【工業的製法】液体空気の分留。沸点の低いN₂(-196℃)の方が先に気体になって出てきます(O₂は-183℃)。\n【実験室的製法】NH₄NO₂ → N₂ + 2H₂O' },
+      { h: '★ アンモニアNH₃ — 肥料の原料!', p: 'アンモニアは刺激臭のある無色の気体で、水によく溶けて弱塩基性を示します。空気より軽いので「上方置換」で集めます。\n\nNH₃ + H₂O ⇌ NH₄⁺ + OH⁻\n\n【検出方法】濃塩酸のふたを近づけると白煙(NH₄Cl)を生じる\nNH₃ + HCl → NH₄Cl' },
+      { h: '★★ ハーバー・ボッシュ法 (NH₃の工業的製法)', p: '窒素と水素を直接反応させてアンモニアを作る画期的な方法。この発明で、世界の食糧生産量は爆発的に増えました(ノーベル賞受賞)!\n\nN₂ + 3H₂ ⇌ 2NH₃\n\n条件は【約500℃、2〜5×10⁷Pa(高圧)、Fe₃O₄触媒】。触媒に四酸化三鉄Fe₃O₄を使うのがポイント!\n\n【実験室的製法】塩化アンモニウムと水酸化カルシウムを混ぜて加熱:\n2NH₄Cl + Ca(OH)₂ → CaCl₂ + 2H₂O + 2NH₃↑' },
+      { h: '★ NH₃の乾燥剤 — ひっかけ注意!', p: 'アンモニアの乾燥には「ソーダ石灰(NaOH + CaO)」を使います。\n\nなぜ他の乾燥剤はダメ?\n× 濃硫酸・十酸化四リン → 酸性なのでNH₃(塩基)と中和してしまう\n× 塩化カルシウム → CaCl₂·8NH₃という化合物をつくってしまう\n○ ソーダ石灰 → NH₃と反応しない塩基性乾燥剤\n\nこれはテストで超頻出! 必ず覚えましょう!' },
+      { h: '一酸化窒素NOと二酸化窒素NO₂', p: '【NO】無色・無臭、水に溶けにくい → 水上置換\n空気中ですぐ酸化されて赤褐色のNO₂になります。\n3Cu + 8HNO₃(希) → 3Cu(NO₃)₂ + 4H₂O + 2NO↑\n\n【NO₂】赤褐色・刺激臭、水に溶ける → 下方置換\nCu + 4HNO₃(濃) → Cu(NO₃)₂ + 2H₂O + 2NO₂↑\n\n【語呂】水に溶けにくい気体: NO・CO・H₂・O₂・N₂ → 「農工水産庁(のう・こう・すい・さん・ちょう)は水に溶けにくい」' },
+      { h: '★★ 硝酸HNO₃とオストワルト法', p: '硝酸は強酸で、かつ強い酸化作用ももちます。銅や銀などイオン化傾向が水素より小さい金属も溶かします。\n\n【工業的製法】オストワルト法 — 触媒は白金Pt!\n① 4NH₃ + 5O₂ → 4NO + 6H₂O (Pt触媒、800℃)\n② 2NO + O₂ → 2NO₂\n③ 3NO₂ + H₂O → 2HNO₃ + NO\n\n全体をまとめると: NH₃ + 2O₂ → HNO₃ + H₂O\n\n濃硝酸は光で分解するので、褐色びんに保存!\n4HNO₃ → 4NO₂ + 2H₂O + O₂' },
+      { h: '★ 不動態 — 覚えれば得点源!', p: 'イオン化傾向が比較的大きいFe・Al・Niですが、濃硝酸と反応すると... なんと「反応しなく」なります! 表面に緻密な酸化被膜ができて内部を守るからです。この状態を「不動態」といいます。\n\n濃硝酸と反応しない金属: Fe, Al, Ni\nアルミホイルが錆びにくいのも、表面に酸化被膜があるからですね。' }
+    ],
+    keyPoints: [
+      '【暗記】窒素は空気中に約78%、無色・無臭、反応性に乏しい',
+      '【暗記】N₂工業的製法: 液体空気の分留 (N₂沸点-196℃ < O₂沸点-183℃)',
+      '★ アンモニアNH₃: 刺激臭、水によく溶け弱塩基性、空気より軽い → 上方置換',
+      '★★ NH₃工業的製法: ハーバー・ボッシュ法 (Fe₃O₄触媒、500℃、高圧)',
+      '【暗記】NH₃実験室的製法: 2NH₄Cl + Ca(OH)₂ → CaCl₂ + 2H₂O + 2NH₃',
+      '★★ NH₃の乾燥剤はソーダ石灰! (濃硫酸・十酸化四リン・CaCl₂はNG)',
+      '【暗記】NO: 無色・無臭、水に溶けにくい → 水上置換、空気で酸化されNO₂に',
+      '【暗記】NO₂: 赤褐色・刺激臭、水に溶ける → 下方置換',
+      '★★ 硝酸工業的製法: オストワルト法 (Pt触媒、約800℃)',
+      '★★ 不動態: Fe, Al, Ni は濃硝酸と反応しない(酸化被膜をつくる)',
+      '【暗記】濃硝酸は光で分解 → 褐色びんに保存'
+    ],
+    table: {
+      title: 'NO と NO₂ の比較',
+      headers: ['', '一酸化窒素 NO', '二酸化窒素 NO₂'],
+      rows: [
+        ['色', '無色', '赤褐色'],
+        ['臭い', '無臭', '刺激臭'],
+        ['水溶性', '溶けにくい', '溶けて硝酸に'],
+        ['捕集法', '水上置換', '下方置換'],
+        ['実験室的製法', '3Cu + 8HNO₃(希) → 3Cu(NO₃)₂ + 4H₂O + 2NO', 'Cu + 4HNO₃(濃) → Cu(NO₃)₂ + 2H₂O + 2NO₂']
+      ]
+    },
+    fillBlanks: [
+      {
+        text: 'アンモニアNH₃は{0}臭のある無色の気体で、空気より{1}、水によく溶け{2}塩基性を示します。捕集は{3}置換で行います。乾燥剤には{4}を用います (塩化カルシウムや濃硫酸は反応するため使えません)。',
+        answers: ['刺激', '軽い', '弱', '上方', 'ソーダ石灰'],
+        bank: ['刺激', '腐卵', '無', '軽い', '重い', '弱', '強', '上方', '下方', '水上', 'ソーダ石灰', '塩化カルシウム', '濃硫酸', '十酸化四リン']
+      },
+      {
+        text: 'アンモニアの工業的製法を{0}法といい、{1}を触媒に、窒素と水素から直接合成します。\nN₂ + 3H₂ ⇌ 2NH₃\n実験室的製法では、塩化アンモニウムと{2}を混合・加熱します。\n2NH₄Cl + Ca(OH)₂ → {3} + 2H₂O + 2NH₃↑',
+        answers: ['ハーバー・ボッシュ', 'Fe₃O₄', '水酸化カルシウム', 'CaCl₂'],
+        bank: ['ハーバー・ボッシュ', 'オストワルト', '接触', 'Fe₃O₄', 'Pt', 'Ni', '水酸化カルシウム', '酸化カルシウム', 'CaCl₂', 'CaO', 'Ca(OH)₂']
+      },
+      {
+        text: '一酸化窒素NOは{0}色・{1}臭で水に溶けにくく、{2}置換で集めます。空気中で酸化されて{3}色の二酸化窒素NO₂になります。実験室では銅に{4}硝酸を加えて作ります。',
+        answers: ['無', '無', '水上', '赤褐', '希'],
+        bank: ['無', '赤褐', '黄', '刺激', '水上', '下方', '上方', '希', '濃']
+      },
+      {
+        text: '硝酸の工業的製法を{0}法といいます。{1}を触媒にNH₃をO₂で酸化してNOにし、さらに酸化してNO₂、これを水と反応させます。全体をまとめると\nNH₃ + 2O₂ → {2} + H₂O',
+        answers: ['オストワルト', '白金 (Pt)', 'HNO₃'],
+        bank: ['オストワルト', 'ハーバー・ボッシュ', '接触式', '白金 (Pt)', 'Fe₃O₄', 'V₂O₅', 'HNO₃', 'HNO₂', 'NaNO₃']
+      },
+      {
+        text: 'Fe, Al, Niは{0}硝酸と反応しません。これは表面に緻密な{1}被膜ができるためで、この状態を{2}といいます。',
+        answers: ['濃', '酸化', '不動態'],
+        bank: ['濃', '希', '熱', '酸化', '還元', '水酸化', '不動態', '安定化', '絶縁体']
+      }
+    ],
+    quiz: [
+      { type: 'mc', q: 'アンモニアの捕集法として正しいのはどれですか?', choices: ['水上置換', '下方置換', '上方置換', '加圧置換'], ans: 2 },
+      { type: 'mc', q: 'アンモニアの工業的製法はどれですか?', choices: ['オストワルト法', 'ハーバー・ボッシュ法', '接触法', 'ソルベー法'], ans: 1 },
+      { type: 'mc', q: 'アンモニアの乾燥に適した乾燥剤はどれですか?', choices: ['濃硫酸', '十酸化四リン', '塩化カルシウム', 'ソーダ石灰'], ans: 3 },
+      { type: 'mc', q: '濃硝酸と反応しない金属(不動態をつくる)の組み合わせはどれですか?', choices: ['Cu, Ag', 'Zn, Mg', 'Fe, Al, Ni', 'Na, K'], ans: 2 },
+      { type: 'mc', q: '希硝酸を銅に加えると発生する気体はどれですか?', choices: ['NO', 'NO₂', 'N₂O', 'H₂'], ans: 0 },
+      { type: 'mc', q: '濃硝酸を銅に加えると発生する気体はどれですか?', choices: ['NO', 'NO₂', 'H₂', 'O₂'], ans: 1 },
+      { type: 'short', q: '濃硝酸を保存する容器の色は?', ans: ['褐色', '茶色'] },
+      { type: 'mc', q: 'オストワルト法で使う触媒はどれですか?', choices: ['Fe₃O₄', 'V₂O₅', '白金 Pt', 'Ni'], ans: 2 }
+    ]
+  },
+
+  {
+    id: 'phosphorus',
+    name: 'リン',
+    symbol: 'P',
+    color: '#EC4899',
+    colorD: '#DB2777',
+    bgColor: '#FCE7F3',
+    intro: 'マッチの先、肥料、そしてDNAの材料 — あらゆる場面に登場するリン。黄リンは猛毒で水中保存、赤リンは安全。同じ元素なのに、まるで双子のように性質が違うんです。',
+    explain: [
+      { h: 'リンは2つの顔をもつ元素', p: 'リンPは周期表15族。同素体が2つあり、性質がまるで違います。\n\n【黄リンP₄】淡黄色の固体、四面体型のP₄分子\n  → 猛毒! 自然発火する! → 水中で保存\n\n【赤リンP】赤褐色の粉末、巨大分子\n  → 毒性が少ない、発火しにくい → マッチの側薬に' },
+      { h: '★ 燃焼すると白い煙 — 十酸化四リン', p: 'リンを空気中で燃やすと、白色の十酸化四リンP₄O₁₀が生成します。\n\nP₄ + 5O₂ → P₄O₁₀\n\nP₄O₁₀は強い吸湿性があり、乾燥剤として使われます。水と反応するとリン酸H₃PO₄になります。\nP₄O₁₀ + 6H₂O → 4H₃PO₄' },
+      { h: '💡 リンは肥料の主役!', p: '植物の三大栄養素は「窒素N・リンP・カリウムK」。リンは花や実をつけるのに特に重要です。\n\n【肥料の作り方】リン鉱石Ca₃(PO₄)₂は水に溶けにくいので、硫酸で処理して水に溶けるリン酸二水素カルシウムCa(H₂PO₄)₂にします。これを「過リン酸石灰」といい、肥料として使われます。\n\nCa₃(PO₄)₂ + 2H₂SO₄ → Ca(H₂PO₄)₂ + 2CaSO₄' }
+    ],
+    keyPoints: [
+      '【暗記】リンの同素体: 黄リンP₄(淡黄色・猛毒・自然発火) と 赤リンP(赤褐色・毒性低い・マッチ)',
+      '★ 黄リンは四面体状のP₄分子 → 自然発火するため水中保存',
+      '★ 赤リンはマッチの側薬に使用',
+      '【暗記】P₄ + 5O₂ → P₄O₁₀ (十酸化四リン、白色、強い吸湿性)',
+      '★ P₄O₁₀は乾燥剤として使用',
+      '【暗記】P₄O₁₀ + 6H₂O → 4H₃PO₄ (リン酸)',
+      '★ 過リン酸石灰 Ca(H₂PO₄)₂ は肥料として利用'
+    ],
+    table: {
+      title: '黄リン と 赤リン の比較',
+      headers: ['', '黄リン P₄', '赤リン P'],
+      rows: [
+        ['色・形状', '淡黄色・固体', '赤褐色・粉末'],
+        ['毒性', '猛毒 ⚠', '少ない'],
+        ['発火性', '自然発火 → 水中で保存', '発火しにくい'],
+        ['組成', '四面体型 P₄ 分子', '巨大分子 (組成式 P)'],
+        ['用途', '実験用', 'マッチ・農薬']
+      ]
+    },
+    fillBlanks: [
+      {
+        text: 'リンPの同素体には{0}と{1}があります。{0}は{2}色で猛毒、空気中で{3}するため{4}中で保存します。一方{1}は赤褐色の粉末で毒性が低く、{5}の側薬に使われます。',
+        answers: ['黄リン', '赤リン', '淡黄', '自然発火', '水', 'マッチ'],
+        bank: ['黄リン', '赤リン', '黒リン', '淡黄', '赤褐', '青', '自然発火', '昇華', '蒸発', '水', '油', 'アルコール', 'マッチ', '花火', '肥料']
+      },
+      {
+        text: '黄リンを空気中で燃焼させると白色の{0}が得られます。これを水に加えると{1}H₃PO₄となります。{0}は強い{2}性があるため{3}として使われます。',
+        answers: ['十酸化四リン(P₄O₁₀)', 'リン酸', '吸湿', '乾燥剤'],
+        bank: ['十酸化四リン(P₄O₁₀)', '二酸化リン', '三酸化リン', 'リン酸', '亜リン酸', '過リン酸', '吸湿', '発散', '乾燥剤', '漂白剤', '脱水剤']
+      },
+      {
+        text: 'リン鉱石{0}に硫酸を加えてリン酸二水素カルシウム{1}(過リン酸石灰)にし、{2}として利用します。',
+        answers: ['Ca₃(PO₄)₂', 'Ca(H₂PO₄)₂', '肥料'],
+        bank: ['Ca₃(PO₄)₂', 'CaCO₃', 'CaSO₄', 'Ca(H₂PO₄)₂', 'Ca(H₃PO₄)₂', 'CaHPO₄', '肥料', '薬品', '食品']
+      }
+    ],
+    quiz: [
+      { type: 'mc', q: '空気中で自然発火する同素体はどれですか?', choices: ['赤リン', '黄リン', '黒リン', '白リン'], ans: 1 },
+      { type: 'mc', q: '黄リンを保存する方法として正しいのはどれですか?', choices: ['油中保存', '水中保存', '真空保存', '冷凍保存'], ans: 1 },
+      { type: 'mc', q: 'マッチの側薬に使われるのはどれですか?', choices: ['黄リン', '赤リン', '十酸化四リン', 'リン酸'], ans: 1 },
+      { type: 'short', q: 'リンを空気中で燃焼して得られる白色の固体の化学式は?', ans: ['P₄O₁₀', 'P4O10'] },
+      { type: 'mc', q: '十酸化四リンの主な用途はどれですか?', choices: ['肥料', '乾燥剤', '殺虫剤', '漂白剤'], ans: 1 },
+      { type: 'mc', q: '過リン酸石灰は何として使われますか?', choices: ['燃料', '肥料', '洗剤', '爆薬'], ans: 1 }
+    ]
+  },
+
+  {
+    id: 'carbon_silicon',
+    name: '炭素・ケイ素',
+    symbol: 'C',
+    color: '#6B7280',
+    colorD: '#4B5563',
+    bgColor: '#F3F4F6',
+    intro: '私たち生命の体を作る炭素、そしてスマートフォンの半導体の主役ケイ素。どちらも周期表14族で、さまざまな顔(同素体)を持つおもしろい元素です。',
+    explain: [
+      { h: '炭素のいろいろな姿 — 同素体の王様', p: '炭素Cはたくさんの同素体を持ちます。どれも同じ炭素からできているのに性質が全然違う!\n\n【ダイヤモンド】最も硬い天然物質、電気を通さない → 宝石・研磨剤\n【黒鉛(グラファイト)】軟らかく電気を通す、平面状の層状構造 → 鉛筆の芯・電極\n【フラーレンC₆₀】サッカーボールのような球状分子\n【カーボンナノチューブ】黒鉛が筒状になったもの、強くて電気を通す' },
+      { h: '★ 一酸化炭素COと二酸化炭素CO₂', p: '【CO】無色・無臭・有毒! ヘモグロビンと結合して呼吸を止めます(だから換気が大切!)。水に溶けにくい。\n  還元性があり、金属酸化物を還元 — 鉄の製錬で大活躍!\n  CuO + CO → Cu + CO₂\n\n【CO₂】無色・無臭、水に少し溶けて弱酸性、ドライアイスで昇華\n  【実験室】CaCO₃ + 2HCl → CaCl₂ + H₂O + CO₂↑\n  【石灰水で検出!】Ca(OH)₂ + CO₂ → CaCO₃ + H₂O (白濁)' },
+      { h: '★ ケイ素Siは半導体の王様', p: 'ケイ素Siは地殻にとても多く(酸素に次いで2番目)存在しますが、天然には単体ではありません。SiO₂や岩石として存在。工業的に純粋なSiを取り出し、半導体として使います。スマホやコンピュータのICチップはケイ素でできていますね!' },
+      { h: '💡 二酸化ケイ素SiO₂の変身物語', p: 'SiO₂(水晶・石英・けい砂)はとても面白い元素。加工するとさまざまな製品になります!\n\n① SiO₂ + 2NaOH → Na₂SiO₃ + H₂O (ケイ酸ナトリウム)\n② Na₂SiO₃ + H₂O → 粘りのある水溶液「水ガラス」\n③ 水ガラスに塩酸を加える → ゲル状のケイ酸\n④ ケイ酸を乾燥 → シリカゲル(乾燥剤・脱臭剤 ★ お菓子の袋に入っているあれです!)\n\nフッ化水素酸HFはガラスを溶かします:\nSiO₂ + 6HF → H₂SiF₆ + 2H₂O' }
+    ],
+    keyPoints: [
+      '【暗記】炭素同素体: ダイヤモンド(硬・絶縁)・黒鉛(軟・電導)・フラーレンC₆₀・カーボンナノチューブ',
+      '★ ダイヤモンドは正四面体構造、黒鉛は層状構造',
+      '【暗記】CO: 無色・無臭・有毒! 水に溶けにくい、還元性(金属酸化物を還元)',
+      '★ CO₂: 無色・無臭、水に少し溶け弱酸性、ドライアイスで昇華',
+      '【暗記】CO₂実験室的製法: CaCO₃ + 2HCl → CaCl₂ + H₂O + CO₂↑',
+      '★★ CO₂の検出: 石灰水Ca(OH)₂が白濁 (CaCO₃生成)',
+      '【暗記】Si: 天然には単体で存在せず、SiO₂として。半導体材料',
+      '★ SiO₂ → ケイ酸ナトリウム → 水ガラス → ケイ酸 → シリカゲル (乾燥剤)',
+      '【暗記】HFがガラスを溶かす: SiO₂ + 6HF → H₂SiF₆ + 2H₂O'
+    ],
+    table: {
+      title: '炭素の同素体',
+      headers: ['同素体', '色', '性質・用途'],
+      rows: [
+        ['ダイヤモンド', '無色透明', 'きわめて硬い、電気を通さない、宝石'],
+        ['黒鉛(グラファイト)', '黒色', '軟らかい、電気を通す、鉛筆・電極'],
+        ['フラーレン', '褐色〜黒', 'C₆₀など球状分子'],
+        ['カーボンナノチューブ', '黒', '黒鉛が筒状に、強度大、電気伝導']
+      ]
+    },
+    fillBlanks: [
+      {
+        text: '炭素の同素体のうち、{0}は最も硬く電気を通さず宝石に、{1}は軟らかく電気を通し鉛筆や電極に、{2}はC₆₀分子からなる球状の同素体です。',
+        answers: ['ダイヤモンド', '黒鉛', 'フラーレン'],
+        bank: ['ダイヤモンド', '黒鉛', 'フラーレン', 'カーボンナノチューブ', '無定形炭素']
+      },
+      {
+        text: '二酸化炭素は石灰石に{0}を加えて発生させます。\nCaCO₃ + 2HCl → {1} + H₂O + CO₂↑\n石灰水Ca(OH)₂に通すと{2}炭酸カルシウムが生じて{3}します。\nCa(OH)₂ + CO₂ → CaCO₃ + H₂O',
+        answers: ['希塩酸', 'CaCl₂', '白色の', '白濁'],
+        bank: ['希塩酸', '濃塩酸', '希硫酸', 'CaCl₂', 'CaSO₄', 'Ca(OH)₂', '白色の', '黒色の', '白濁', '透明化']
+      },
+      {
+        text: 'ケイ素Siの酸化物である{0}は、天然には水晶・石英・けい砂として存在します。これを水酸化ナトリウムとともに加熱すると{1}が生じ、水を加えて加熱すると{2}(水ガラス)になります。水ガラスの水溶液に塩酸を加えるとゲル状の{3}酸が得られ、乾燥させると{4}となり、乾燥剤・脱臭剤として使われます。',
+        answers: ['SiO₂', 'ケイ酸ナトリウム', 'Na₂SiO₃', 'ケイ', 'シリカゲル'],
+        bank: ['SiO₂', 'SiO', 'Si₂O', 'ケイ酸ナトリウム', 'ケイ酸カルシウム', 'Na₂SiO₃', 'NaSiO₂', 'ケイ', '炭', '塩', 'シリカゲル', 'セラミック', 'ガラス']
+      }
+    ],
+    quiz: [
+      { type: 'mc', q: 'ダイヤモンドの性質として誤っているのはどれですか?', choices: ['極めて硬い', '電気を通さない', '無色透明', '電気を通す'], ans: 3 },
+      { type: 'mc', q: '鉛筆の芯に使われる炭素の同素体はどれですか?', choices: ['ダイヤモンド', '黒鉛', 'フラーレン', '非晶炭素'], ans: 1 },
+      { type: 'mc', q: 'CO₂の検出反応として正しいのはどれですか?', choices: ['石灰水が白濁する', 'BTB溶液が緑になる', '赤リトマス紙が青くなる', 'ヨウ素デンプン紙が青に'], ans: 0 },
+      { type: 'mc', q: 'ドライアイスの説明として正しいのはどれですか?', choices: ['CO₂の固体で昇華する', 'H₂Oの固体', '氷が冷凍されたもの', 'N₂の固体'], ans: 0 },
+      { type: 'short', q: '二酸化ケイ素の化学式は?', ans: ['SiO₂', 'SiO2'] },
+      { type: 'mc', q: 'シリカゲルの主な用途はどれですか?', choices: ['乾燥剤', '漂白剤', '肥料', '酸化剤'], ans: 0 },
+      { type: 'mc', q: 'フッ化水素酸HFがガラスを溶かす反応で生じるのはどれですか?', choices: ['H₂SiF₆', 'SiCl₄', 'H₂SO₄', 'Na₂SiO₃'], ans: 0 }
+    ]
+  },
+
+  {
+    id: 'alkali',
+    name: 'アルカリ金属',
+    symbol: 'Na',
+    color: '#EF4444',
+    colorD: '#DC2626',
+    bgColor: '#FEE2E2',
+    intro: '1族のアルカリ金属。ナトリウムNaやカリウムKは食塩や肥料でおなじみですね。でも単体はとても反応しやすく、水とすら激しく反応します。取り扱いに注意が必要な元気な元素たちです。',
+    explain: [
+      { h: 'アルカリ金属は「電子を1個あげたい」', p: 'アルカリ金属(H以外の1族: Li, Na, K, Rb, Cs, Fr)は、価電子を1個しかもっていません。この1個を手放して1価の陽イオンになれば希ガスと同じ安定な電子配置! そのため反応性がとても高いのです。\n\nNa → Na⁺ + e⁻' },
+      { h: '★ なぜ石油の中で保存するの?', p: 'アルカリ金属は空気中の酸素とすぐ反応してしまい、水とも激しく反応して水素を発生します!\n2Na + 2H₂O → 2NaOH + H₂↑\n\nだから空気や水に触れないように、石油(灯油)の中に保存するのです。触ると危険なので実験では絶対にピンセットで扱いましょう。' },
+      { h: '★★ 炎色反応 — 花火の美しさの秘密', p: 'アルカリ金属を炎に入れると、それぞれ特有の色を出します。これを炎色反応といい、元素の判別に使えます。花火の色もこの原理!\n\n【暗記】\n・Li(リチウム) → 赤\n・Na(ナトリウム) → 黄 ★\n・K(カリウム) → 赤紫 ★\n・Rb(ルビジウム) → 赤\n・Cs(セシウム) → 青紫\n\n語呂: 「リアカー 無き K 村 動力 借るとう するもくれない 馬力」(Li赤, Na黄, K紫, Cu青緑, Ca橙, Sr紅, Ba緑)' },
+      { h: '💡 水酸化ナトリウムNaOHの性質', p: '白色の固体で強塩基性。次の3つの大切な性質を覚えましょう!\n\n① 潮解性 — 空気中の水分を吸って溶けてしまう\n② 空気中のCO₂を吸収してNa₂CO₃になる\n③ 皮膚や衣類を腐食する(取り扱い注意!)\n\n石けん・紙・繊維の工業的製法に大量に使われています。' },
+      { h: '★ 炭酸ナトリウムと炭酸水素ナトリウム', p: '【Na₂CO₃】洗濯用アルカリ洗剤、ガラスの製造原料\n  十水和物Na₂CO₃·10H₂Oは「風解性」(空気中で水が抜けて粉末に)\n\n【NaHCO₃】別名「重曹」「ふくらし粉」\n  加熱で分解: 2NaHCO₃ → Na₂CO₃ + H₂O + CO₂↑\n  ケーキが膨らむのは、このCO₂のおかげ!\n\n【違いを覚えよう!】\n・潮解(ちょうかい)=空気中の水を吸って溶ける → NaOH\n・風解(ふうかい)=結晶水を失って粉末化 → Na₂CO₃·10H₂O' },
+      { h: '★★ アンモニアソーダ法(ソルベー法)', p: 'Na₂CO₃の工業的製法です。原料は食塩NaClと石灰石CaCO₃だけ!\n\n① NaCl + NH₃ + CO₂ + H₂O → NaHCO₃↓ + NH₄Cl\n② 2NaHCO₃ → Na₂CO₃ + H₂O + CO₂ (加熱分解)\n③ CaCO₃ → CaO + CO₂ (石灰石を加熱)\n④ CaO + H₂O → Ca(OH)₂\n⑤ 2NH₄Cl + Ca(OH)₂ → CaCl₂ + 2NH₃ + 2H₂O (NH₃を回収し再利用)\n\n全体: 2NaCl + CaCO₃ → Na₂CO₃ + CaCl₂\n\nNH₃を回収してリサイクルする賢い方法です!' }
+    ],
+    keyPoints: [
+      '【暗記】1族(Hを除く): Li, Na, K, Rb, Cs, Fr → 価電子1個、1価の陽イオン',
+      '★★ 常温で水と反応しH₂発生: 2Na + 2H₂O → 2NaOH + H₂↑',
+      '【暗記】空気中で酸化されやすい → 石油中に保存',
+      '★★ 炎色反応: Li(赤)・Na(黄)・K(赤紫)・Rb(赤)・Cs(青紫)',
+      '★ NaOH: 強塩基、潮解性、空気中のCO₂を吸ってNa₂CO₃に',
+      '【暗記】潮解=水を吸って溶ける(NaOHなど)、風解=水を失って粉末(Na₂CO₃·10H₂Oなど)',
+      '★★ NaHCO₃(重曹・ふくらし粉)加熱分解: 2NaHCO₃ → Na₂CO₃ + H₂O + CO₂',
+      '★★ Na₂CO₃の工業的製法: アンモニアソーダ法(ソルベー法)',
+      '★ 全体式: 2NaCl + CaCO₃ → Na₂CO₃ + CaCl₂'
+    ],
+    table: {
+      title: 'アンモニアソーダ法(ソルベー法)の流れ',
+      headers: ['段階', '反応式'],
+      rows: [
+        ['①', 'NaCl + NH₃ + CO₂ + H₂O → NaHCO₃↓ + NH₄Cl'],
+        ['②', '2NaHCO₃ → Na₂CO₃ + H₂O + CO₂ (加熱分解)'],
+        ['③', 'CaCO₃ → CaO + CO₂ (石灰石加熱)'],
+        ['④', 'CaO + H₂O → Ca(OH)₂'],
+        ['⑤', '2NH₄Cl + Ca(OH)₂ → CaCl₂ + 2H₂O + 2NH₃ (NH₃回収)'],
+        ['全体 ★', '2NaCl + CaCO₃ → Na₂CO₃ + CaCl₂']
+      ]
+    },
+    fillBlanks: [
+      {
+        text: 'アルカリ金属は周期表の{0}族(Hを除く)に属し、価電子{1}個、{2}価の陽イオンになりやすい元素です。常温で水と反応して{3}を発生します。空気中ですみやかに酸化されるため、{4}中に保存します。',
+        answers: ['1', '1', '1', '水素(H₂)', '石油'],
+        bank: ['1', '2', '17', '18', '0', '水素(H₂)', '酸素', '塩素', '石油', '水', 'エタノール']
+      },
+      {
+        text: '水酸化ナトリウムNaOHは白色の固体で、強い{0}性を示します。空気中で水分を吸収して溶ける現象を{1}といい、空気中のCO₂を吸収して{2}になります。',
+        answers: ['塩基', '潮解', '炭酸ナトリウム(Na₂CO₃)'],
+        bank: ['塩基', '酸', '潮解', '風解', '昇華', '炭酸ナトリウム(Na₂CO₃)', '炭酸水素ナトリウム(NaHCO₃)', '酢酸ナトリウム']
+      },
+      {
+        text: '炭酸水素ナトリウムNaHCO₃を加熱すると、\n2NaHCO₃ → {0} + H₂O + {1}↑\nとなり、ふくらし粉(ベーキングパウダー)として利用されます。',
+        answers: ['Na₂CO₃', 'CO₂'],
+        bank: ['Na₂CO₃', 'NaOH', 'Na₂O', 'CO₂', 'O₂', 'H₂']
+      },
+      {
+        text: '炭酸ナトリウムの工業的製法を{0}法(ソルベー法)といい、食塩水にアンモニアと{1}を吹き込んで沈殿を作ります。NaClとCaCO₃を原料とし、全体としては\n2NaCl + CaCO₃ → {2} + CaCl₂',
+        answers: ['アンモニアソーダ', 'CO₂', 'Na₂CO₃'],
+        bank: ['アンモニアソーダ', 'ハーバー・ボッシュ', 'オストワルト', 'CO₂', 'O₂', 'N₂', 'Na₂CO₃', 'NaOH', 'NaHCO₃']
+      }
+    ],
+    quiz: [
+      { type: 'mc', q: 'ナトリウムの炎色反応は何色ですか?', choices: ['赤', '黄', '青', '緑'], ans: 1 },
+      { type: 'mc', q: 'カリウムの炎色反応は何色ですか?', choices: ['赤紫', '黄', '赤', '青'], ans: 0 },
+      { type: 'mc', q: 'NaOHが空気中で水分を吸収して溶ける現象を何といいますか?', choices: ['風解', '潮解', '昇華', '蒸発'], ans: 1 },
+      { type: 'mc', q: 'Na₂CO₃·10H₂Oが粉末になる現象を何といいますか?', choices: ['潮解', '風解', '融解', '昇華'], ans: 1 },
+      { type: 'mc', q: '炭酸ナトリウムの工業的製法はどれですか?', choices: ['ハーバー・ボッシュ法', 'オストワルト法', 'アンモニアソーダ法', '接触法'], ans: 2 },
+      { type: 'short', q: 'ナトリウム金属を保存する液体は?', ans: ['石油', 'ケロシン', '灯油'] },
+      { type: 'mc', q: '炭酸水素ナトリウムの主な用途はどれですか?', choices: ['漂白剤', 'ふくらし粉(ベーキングパウダー)', '乾燥剤', '塗料'], ans: 1 }
+    ]
+  },
+
+  {
+    id: 'group2',
+    name: '2族元素',
+    symbol: 'Ca',
+    color: '#14B8A6',
+    colorD: '#0D9488',
+    bgColor: '#CCFBF1',
+    intro: 'カルシウムCaは骨や歯の主成分、マグネシウムMgは葉緑素の中心。私たちの体や植物に欠かせない元素です。石灰石・大理石・セメントなど、建物にもたくさん使われています。',
+    explain: [
+      { h: '2族元素って何?', p: '2族の元素: Be, Mg, Ca, Sr, Ba, Ra\n\nこのうちCa, Sr, Ba(とRa)を特に「アルカリ土類金属」とよびます。\n昔はBe, Mgは性質が少し違うので除外していましたが、今はBe〜Raをすべてアルカリ土類金属と呼ぶこともあります。\n\n価電子は2個 → 2価の陽イオンになりやすい。' },
+      { h: '★ Mgだけちょっと違う!', p: 'Mg以外の2族元素(Ca, Sr, Ba)は常温の水と反応しますが、Mgは違います!\n\n【Mg】常温の水とはほとんど反応しない。熱水や水蒸気となら反応。炎色反応も示さない(試験でよく聞かれる!)。\n【Ca, Sr, Ba】常温の水と反応してH₂発生。炎色反応を示す。\n\nこれは重要な違いです。' },
+      { h: '★★ 炎色反応を覚えよう', p: '・Ca(カルシウム) → 橙赤\n・Sr(ストロンチウム) → 紅(深赤)\n・Ba(バリウム) → 黄緑\n・Mg(マグネシウム) → 示さない!\n\n語呂:「リアカー 無き K 村 動力 借る と もう くれない 馬力」\n→ Li赤・Na黄・K紫・Cu青緑・Ca橙・Sr紅・Ba緑' },
+      { h: '💡 カルシウム化合物の大活躍', p: '【CaCO₃】石灰石・大理石の主成分。建築材料、チョーク\n【CaO】生石灰。吸湿性あり乾燥剤に、食品保存にも\n【Ca(OH)₂】消石灰、飽和水溶液は石灰水(CO₂検出に使用!)\n【CaSO₄·2H₂O】せっこう。医療用ギプスや石膏像の材料\n【CaCl(ClO)·H₂O】さらし粉、プールの消毒\n\n流れ: CaCO₃ → (加熱) → CaO → (水) → Ca(OH)₂ → (CO₂) → CaCO₃\nこの循環は重要!' },
+      { h: '★ せっこうギプスの不思議', p: 'せっこうCaSO₄·2H₂Oを加熱すると、水を一部失って焼きせっこうCaSO₄·½H₂Oになります。この焼きせっこうに水を加えるとまた元のせっこうに戻って固まります! だから医療用ギプスや石膏像に使えるのですね。\n\nCaSO₄·2H₂O → CaSO₄·½H₂O + 3/2 H₂O' },
+      { h: '💡 BaSO₄は胃のレントゲンに!', p: '硫酸バリウムBaSO₄は水にほぼ溶けない白色の粉末です。X線を通さないので、胃のバリウム検査で飲む白い液体として使われています。(ちなみにBa²⁺自体は有毒ですが、BaSO₄は溶けないので安全!)' }
+    ],
+    keyPoints: [
+      '【暗記】2族: Be, Mg, Ca, Sr, Ba, Ra。価電子2個、2価の陽イオン',
+      '★ Mgは常温の水とほとんど反応しない。熱水や水蒸気と反応',
+      '★ Ca, Sr, Baは常温の水と反応してH₂発生',
+      '★★ 炎色反応: Ca(橙赤)・Sr(紅)・Ba(黄緑)。ただしMgは示さない!',
+      '【暗記】CaCO₃(石灰石)加熱でCaO(生石灰)に: CaCO₃ → CaO + CO₂',
+      '【暗記】CaO + H₂O → Ca(OH)₂ + 熱 (消石灰)',
+      '★ Ca(OH)₂水溶液=石灰水、CO₂で白濁 → CO₂検出',
+      '★ CaSO₄·2H₂O(せっこう) → 焼きせっこうCaSO₄·½H₂O → 医療用ギプス',
+      '★ BaSO₄: 水に不溶、X線造影剤(胃のバリウム検査)'
+    ],
+    table: {
+      title: 'カルシウム化合物の変化',
+      headers: ['名称', '化学式', '反応・用途'],
+      rows: [
+        ['石灰石・大理石', 'CaCO₃', '加熱でCaO + CO₂'],
+        ['生石灰', 'CaO', '水と反応してCa(OH)₂ + 熱'],
+        ['消石灰', 'Ca(OH)₂', '飽和水溶液=石灰水、CO₂で白濁 ★'],
+        ['せっこう', 'CaSO₄·2H₂O', '加熱で焼きせっこう(医療ギプス)'],
+        ['さらし粉', 'CaCl(ClO)·H₂O', '消毒・漂白']
+      ]
+    },
+    fillBlanks: [
+      {
+        text: '2族元素の価電子は{0}個で、{1}価の陽イオンになりやすいです。炎色反応は Ca が{2}色、Sr が{3}色、Ba が{4}色を示します。ただし{5}は炎色反応を示しません。',
+        answers: ['2', '2', '橙赤', '紅(深赤)', '黄緑', 'Mg'],
+        bank: ['2', '1', '0', '橙赤', '紅(深赤)', '黄緑', '赤紫', '黄', 'Mg', 'Be', 'Ca']
+      },
+      {
+        text: '石灰石CaCO₃を加熱すると{0}(生石灰)になります。\nCaCO₃ → {0} + CO₂↑\n{0}に水を加えると{1}(消石灰)ができ、発熱します。\n{0} + H₂O → {1}\n{1}の飽和水溶液を{2}といい、CO₂を通すと{3}の沈殿が生じて白濁します。',
+        answers: ['CaO', 'Ca(OH)₂', '石灰水', 'CaCO₃'],
+        bank: ['CaO', 'Ca(OH)₂', 'CaCl₂', 'CaSO₄', '石灰水', '食塩水', '酢酸水', 'CaCO₃', 'CaSO₄', 'CaCl₂']
+      },
+      {
+        text: 'せっこう{0}を加熱すると、焼きせっこう{1}が得られます。これは水を加えると再び元のせっこうに戻り硬化するので、医療用{2}や石膏像に使われます。',
+        answers: ['CaSO₄·2H₂O', 'CaSO₄·½H₂O', 'ギプス'],
+        bank: ['CaSO₄·2H₂O', 'CaSO₄·10H₂O', 'CaSO₄', 'CaSO₄·½H₂O', 'CaSO₄·3H₂O', 'ギプス', 'マスク', '造影剤']
+      }
+    ],
+    quiz: [
+      { type: 'mc', q: 'カルシウムの炎色反応は何色ですか?', choices: ['黄', '橙赤', '紅', '黄緑'], ans: 1 },
+      { type: 'mc', q: 'バリウムの炎色反応は何色ですか?', choices: ['紅', '黄緑', '赤紫', '黄'], ans: 1 },
+      { type: 'mc', q: '石灰石の主成分はどれですか?', choices: ['CaO', 'Ca(OH)₂', 'CaCO₃', 'CaSO₄'], ans: 2 },
+      { type: 'mc', q: 'X線造影剤として使われるのはどれですか?', choices: ['BaSO₄', 'CaCO₃', 'MgO', 'NaCl'], ans: 0 },
+      { type: 'short', q: '消石灰の飽和水溶液の名前は?', ans: ['石灰水'] },
+      { type: 'mc', q: '焼きせっこうに水を加えるとどうなりますか?', choices: ['生石灰になる', '消石灰になる', '硬化してせっこうに戻る', '石灰水になる'], ans: 2 },
+      { type: 'mc', q: 'Mgは水とどのように反応しますか?', choices: ['常温の水と激しく反応', '熱水や水蒸気と反応', '全く反応しない', '酸を加えないと溶けない'], ans: 1 }
+    ]
+  },
+
+  {
+    id: 'al_zn_sn_pb',
+    name: 'Al・Zn・Sn・Pb',
+    symbol: 'Al',
+    color: '#F97316',
+    colorD: '#EA580C',
+    bgColor: '#FED7AA',
+    intro: '両性金属のAl・Zn・Sn・Pb。アルミ缶のAl、トタン屋根のZn、はんだ付けのSn、鉛蓄電池のPb — 身近なところで大活躍です。「あ・あ・すん・なり 酸・アルカリ」の語呂で覚えよう!',
+    explain: [
+      { h: '両性金属 — 酸にも塩基にも溶ける!', p: 'ふつうの金属は酸にしか溶けません。でも、Al・Zn・Sn・Pbは酸にも強塩基にも溶ける特別な金属で、「両性金属」と呼ばれます。\n\n【覚え方】「あ(Al)・あ(あえん Zn)・すん(Sn)・なり(Pb) 酸・アルカリ(塩基)」\n\n例: Alと酸、Alと塩基\n  2Al + 6HCl → 2AlCl₃ + 3H₂↑\n  2Al + 2NaOH + 6H₂O → 2Na[Al(OH)₄] + 3H₂↑' },
+      { h: '★ アルミニウムAl — 地殻に3番目に多い金属', p: 'アルミニウムは地殻に多い軽くて丈夫な金属。ジュースの缶や飛行機の機体、建築材に使われています。\n\n【工業的製法】原料はボーキサイト(Al₂O₃·nH₂O)\n① ボーキサイトから純粋な酸化アルミニウム(アルミナAl₂O₃)を取り出す\n② アルミナを氷晶石とともに溶かし、電気分解(溶融塩電解)\n\n電気をたくさん使うので、アルミ缶のリサイクルは省エネ効果が大きいんですよ!\n\n【アルマイト】Al表面を人工的に酸化させて保護被膜をつくったもの → 鍋や窓枠に。' },
+      { h: '★ テルミット反応 — 鉄道レールの溶接', p: 'AlはFe₂O₃から鉄を取り出す反応(テルミット反応)に使えます。激しい発熱を伴うので、融解した鉄ができます。鉄道のレールの溶接接合に利用されていますよ!\n\n2Al + Fe₂O₃ → Al₂O₃ + 2Fe' },
+      { h: '★ 水酸化物の反応まとめ', p: '両性金属の水酸化物Al(OH)₃・Zn(OH)₂は、酸にも強塩基にも溶けます!\n\n【Al(OH)₃】\n・酸に溶ける: Al(OH)₃ + 3HCl → AlCl₃ + 3H₂O\n・強塩基に溶ける: Al(OH)₃ + NaOH → Na[Al(OH)₄]\n・アンモニア水には溶けない!\n\n【Zn(OH)₂】\n・酸に溶ける: Zn(OH)₂ + 2HCl → ZnCl₂ + 2H₂O\n・強塩基に溶ける: Zn(OH)₂ + 2NaOH → Na₂[Zn(OH)₄]\n・過剰のアンモニア水にも溶ける: Zn(OH)₂ + 4NH₃ → [Zn(NH₃)₄]²⁺ + 2OH⁻\n\n【違いを覚えよう!】過剰NH₃水にAl(OH)₃は×、Zn(OH)₂は○(錯イオン形成)' },
+      { h: '💡 亜鉛Zn — トタン屋根', p: 'ZnはFeに比べてイオン化しやすい性質があります。Znめっきした鉄板を「トタン」といい、屋根材に使われます。傷がついても、先にZnが酸化されてFeを守ります(犠牲防食)。\n\n対比: Feに錫Snをめっきしたものは「ブリキ」といい、缶詰に使われます。' },
+      { h: '💡 鉛Pb — 鉛蓄電池と放射線遮蔽', p: '【Pb】柔らかい重い金属。鉛蓄電池(自動車のバッテリー)、放射線遮蔽(医療・原発)に使用。\n\n【Pb²⁺は沈殿マニア!】多くの陰イオンと沈殿します:\n・Pb²⁺ + 2Cl⁻ → PbCl₂↓ (白)\n・Pb²⁺ + SO₄²⁻ → PbSO₄↓ (白)\n・Pb²⁺ + 2I⁻ → PbI₂↓ (黄)\n・Pb²⁺ + S²⁻ → PbS↓ (黒)\n・Pb²⁺ + CrO₄²⁻ → PbCrO₄↓ (黄)\n金属イオンの系統分析でも登場します!' }
+    ],
+    keyPoints: [
+      '★★ 両性金属: Al, Zn, Sn, Pb → 「あ・あ・すん・なり 酸・アルカリ」',
+      '【暗記】両性金属は酸にも強塩基にも溶けてH₂発生',
+      '★ Alはボーキサイト(Al₂O₃·nH₂O)から溶融塩電解で製造',
+      '【暗記】Alの酸化被膜をつける加工 = アルマイト',
+      '★ テルミット反応: 2Al + Fe₂O₃ → Al₂O₃ + 2Fe (鉄の溶接)',
+      '【暗記】ミョウバン AlK(SO₄)₂·12H₂O は複塩',
+      '★ 亜鉛Zn: トタン(鉄板にZnめっき)、乾電池の負極',
+      '★ スズSn: ブリキ(鉄板にSnめっき)、はんだ、青銅(Cu+Sn)',
+      '★ 鉛Pb: 鉛蓄電池、放射線遮蔽',
+      '【暗記】Pb²⁺の沈殿: PbCl₂(白)・PbSO₄(白)・PbS(黒)・PbI₂(黄)・PbCrO₄(黄)',
+      '★★ Zn(OH)₂は過剰NH₃水に溶ける ([Zn(NH₃)₄]²⁺)、Al(OH)₃は溶けない!'
+    ],
+    table: {
+      title: '両性元素(単体・水酸化物)の反応',
+      headers: ['元素', '酸との反応', '強塩基との反応'],
+      rows: [
+        ['Al', '2Al + 6HCl → 2AlCl₃ + 3H₂↑', '2Al + 2NaOH + 6H₂O → 2Na[Al(OH)₄] + 3H₂↑'],
+        ['Zn', 'Zn + 2HCl → ZnCl₂ + H₂↑', 'Zn + 2NaOH + 2H₂O → Na₂[Zn(OH)₄] + H₂↑'],
+        ['Al(OH)₃', 'Al(OH)₃ + 3HCl → AlCl₃ + 3H₂O', 'Al(OH)₃ + NaOH → Na[Al(OH)₄]'],
+        ['Zn(OH)₂', 'Zn(OH)₂ + 2HCl → ZnCl₂ + 2H₂O', 'Zn(OH)₂ + 2NaOH → Na₂[Zn(OH)₄]']
+      ]
+    },
+    fillBlanks: [
+      {
+        text: '両性元素は{0}・{1}・{2}・{3}で、「あ・あ・すん・なり」の語呂で覚えます。酸にも強塩基にも溶けて{4}を発生します。',
+        answers: ['Al', 'Zn', 'Sn', 'Pb', 'H₂'],
+        bank: ['Al', 'Zn', 'Sn', 'Pb', 'Fe', 'Cu', 'Mg', 'H₂', 'O₂', 'Cl₂']
+      },
+      {
+        text: 'アルミニウムは{0}(Al₂O₃·nH₂O)から作られます。純粋な酸化アルミニウム(アルミナ)を{1}中で{2}電解して得ます。アルミニウム表面を酸化して保護被膜を作ったものを{3}といいます。',
+        answers: ['ボーキサイト', '氷晶石', '溶融塩', 'アルマイト'],
+        bank: ['ボーキサイト', '赤鉄鉱', '方鉛鉱', '氷晶石', '食塩', '水', '溶融塩', '電気', '水溶液', 'アルマイト', 'ジュラルミン', 'アルミナ']
+      },
+      {
+        text: 'テルミット反応: 2Al + Fe₂O₃ → {0} + 2Fe\nAlがFeを{1}する反応で、{2}の溶接などに利用されます。',
+        answers: ['Al₂O₃', '還元', '鉄(鉄道レール)'],
+        bank: ['Al₂O₃', 'Al(OH)₃', 'AlCl₃', '還元', '酸化', '中和', '鉄(鉄道レール)', '銅', '錫']
+      },
+      {
+        text: 'Zn(OH)₂は過剰のNaOH水溶液に溶けて{0}となり、過剰のアンモニア水に溶けて{1}となります。Al(OH)₃は過剰のNaOHに溶けますが、アンモニア水には{2}。',
+        answers: ['Na₂[Zn(OH)₄]', '[Zn(NH₃)₄]²⁺', '溶けません'],
+        bank: ['Na₂[Zn(OH)₄]', 'Na[Zn(OH)₃]', '[Zn(NH₃)₄]²⁺', '[Zn(NH₃)₂]²⁺', '溶けません', '溶けます']
+      }
+    ],
+    quiz: [
+      { type: 'mc', q: '両性元素の組み合わせとして正しいのはどれですか?', choices: ['Al, Zn, Sn, Pb', 'Na, K, Ca, Mg', 'Fe, Cu, Ag, Au', 'Cl, Br, I, F'], ans: 0 },
+      { type: 'mc', q: 'アルミニウムの鉱石はどれですか?', choices: ['赤鉄鉱', 'ボーキサイト', '黄銅鉱', '方鉛鉱'], ans: 1 },
+      { type: 'mc', q: 'テルミット反応の利用はどれですか?', choices: ['発電', 'レールの溶接', '冷却', '漂白'], ans: 1 },
+      { type: 'mc', q: 'トタンは鉄板に何をめっきしたものですか?', choices: ['Zn', 'Sn', 'Cu', 'Ag'], ans: 0 },
+      { type: 'mc', q: 'ブリキは鉄板に何をめっきしたものですか?', choices: ['Zn', 'Sn', 'Cu', 'Al'], ans: 1 },
+      { type: 'short', q: 'Pb²⁺とCl⁻の沈殿の色は?', ans: ['白', '白色'] },
+      { type: 'mc', q: 'Al(OH)₃は過剰のアンモニア水に溶けますか?', choices: ['溶ける', '溶けない', '少し溶ける', '沸騰すれば溶ける'], ans: 1 }
+    ]
+  },
+
+  {
+    id: 'iron_copper',
+    name: '鉄・銅',
+    symbol: 'Fe',
+    color: '#7C2D12',
+    colorD: '#5B1F0C',
+    bgColor: '#FED7AA',
+    intro: '鉄Feは建物・鉄道・車など、現代文明の土台を支えている金属です。銅Cuは電線や10円玉、鍋の素材に。2つとも遷移元素で、化学反応の色の変化がきれいで楽しい元素です!',
+    explain: [
+      { h: '★ 鉄の製錬 — 溶鉱炉の仕組み', p: '鉄は地殻で4番目に多い元素。鉄鉱石(主に赤鉄鉱Fe₂O₃)を溶鉱炉で還元して作ります。\n\n【溶鉱炉の中身】鉄鉱石 + コークスC + 石灰石CaCO₃\n・コークスが燃えてCOが発生\n・COが鉄鉱石を還元: Fe₂O₃ + 3CO → 2Fe + 3CO₂\n・得られる鉄は炭素を約4%含む「銑鉄(せんてつ)」\n\nこのままでは硬くもろいので、転炉で酸素を吹き込んで炭素を0.02〜2%に減らして「鋼(こう)」にします。これが建築に使える鉄です!\n\n【ステンレス鋼】鋼にCr(クロム)とNi(ニッケル)を加えた合金 → 錆びにくい' },
+      { h: '★★ Fe²⁺ と Fe³⁺ — 試薬で色が変わる!', p: '鉄のイオンには2種類あります。それぞれ試薬との反応で色が違うのがポイント!\n\n【Fe²⁺(淡緑色)】\n・NaOH → Fe(OH)₂ 緑白色沈殿\n・K₃[Fe(CN)₆](ヘキサシアノ鉄(Ⅲ)酸カリウム) → 濃青色沈殿 ★\n\n【Fe³⁺(黄褐色)】\n・NaOH → Fe(OH)₃ 赤褐色沈殿 ★\n・K₄[Fe(CN)₆](ヘキサシアノ鉄(Ⅱ)酸カリウム) → 濃青色沈殿\n・KSCN(チオシアン酸カリウム) → 血赤色(Fe³⁺の特効試薬!) ★\n\n色の違いが分析の決め手になります!' },
+      { h: '★ 銅Cu — イオン化傾向で覚える', p: '銅Cuは11族。電気伝導性がとても高く、電線の主役です。10円玉の素材でもあります。\n\n【重要】Cuはイオン化傾向が水素より小さい!\n→ 希硫酸や希塩酸には溶けない!\n→ でも熱濃硫酸や硝酸には溶ける(酸化作用で)\n\n・Cu + 2H₂SO₄(熱濃) → CuSO₄ + SO₂↑ + 2H₂O\n・3Cu + 8HNO₃(希) → 3Cu(NO₃)₂ + 4H₂O + 2NO↑\n・Cu + 4HNO₃(濃) → Cu(NO₃)₂ + 2H₂O + 2NO₂↑' },
+      { h: '★★ Cu²⁺ — 色の魔術師', p: 'Cu²⁺の水溶液は青色。加える試薬によってどんどん色が変わります!\n\n① NaOH少量 → Cu(OH)₂(青白色沈殿)\n② 加熱 → CuO(黒色)\n③ NH₃水過剰 → [Cu(NH₃)₄]²⁺(深青色、錯イオン!) ★\n④ H₂S → CuS(黒色沈殿)\n\n実験では「最初青、試薬を加えたら深青 → 錯イオンだ!」と覚えましょう。' },
+      { h: '💡 CuSO₄·5H₂Oの色の変化', p: '硫酸銅(Ⅱ)五水和物CuSO₄·5H₂Oは青色の結晶。加熱すると水和水を失って白色の無水CuSO₄になります。\n\nCuSO₄·5H₂O → CuSO₄ (青→白)\n\n逆に、白色のCuSO₄に水を加えると青色に戻ります。この反応を使って、物質中に水が含まれているかを確認する検出試薬にも使えます。料理で使う食塩に水が含まれていないか、こうしたテストで調べられるんですね!' }
+    ],
+    keyPoints: [
+      '【暗記】鉄Fe: 8族、Fe²⁺(淡緑色)・Fe³⁺(黄褐色)',
+      '★★ 鉄の製錬: 赤鉄鉱Fe₂O₃ + コークスCで溶鉱炉 → 銑鉄 → 転炉 → 鋼',
+      '★ ステンレス鋼 = Fe + Cr + Ni',
+      '★★ Fe²⁺水溶液: NaOH→Fe(OH)₂(緑白)、K₃[Fe(CN)₆]→濃青色',
+      '★★ Fe³⁺水溶液: NaOH→Fe(OH)₃(赤褐)、K₄[Fe(CN)₆]→濃青、KSCN→血赤色',
+      '【暗記】銅Cu: 11族、Cu²⁺水溶液は青色',
+      '★★ Cuは希硫酸・希塩酸に溶けない(イオン化傾向小)、熱濃硫酸・硝酸には溶ける',
+      '★★ Cu²⁺: NaOH少量→Cu(OH)₂(青白)、加熱→CuO(黒)、NH₃過剰→[Cu(NH₃)₄]²⁺(深青色)',
+      '【暗記】CuSO₄·5H₂O(青) 加熱で CuSO₄(白) + 5H₂O (水の検出に利用)'
+    ],
+    table: {
+      title: 'Fe²⁺ と Fe³⁺ の反応',
+      headers: ['試薬', 'Fe²⁺(淡緑色)', 'Fe³⁺(黄褐色)'],
+      rows: [
+        ['NaOH', 'Fe(OH)₂ 緑白色沈殿', 'Fe(OH)₃ 赤褐色沈殿 ★'],
+        ['K₃[Fe(CN)₆]', '濃青色沈殿 ★', '反応なし'],
+        ['K₄[Fe(CN)₆]', '反応なし', '濃青色沈殿'],
+        ['KSCN', '反応なし', '血赤色 ★ (Fe³⁺検出)']
+      ]
+    },
+    fillBlanks: [
+      {
+        text: '鉄の製錬は、{0}(主成分Fe₂O₃)をコークスCと石灰石CaCO₃とともに{1}で加熱し、COによって還元します。得られる鉄は炭素を約4%含み{2}といい、{3}で炭素を減らして{4}にします。',
+        answers: ['赤鉄鉱', '溶鉱炉', '銑鉄', '転炉', '鋼'],
+        bank: ['赤鉄鉱', '黄銅鉱', '方鉛鉱', '溶鉱炉', '転炉', '電気炉', '銑鉄', '鋼', 'ステンレス']
+      },
+      {
+        text: 'Fe²⁺は{0}色、Fe³⁺は{1}色の水溶液を示します。Fe³⁺に{2}(チオシアン酸カリウム)水溶液を加えると{3}色に発色し、Fe³⁺の検出に使われます。',
+        answers: ['淡緑', '黄褐', 'KSCN', '血赤'],
+        bank: ['淡緑', '青', '黄褐', '赤褐', 'KSCN', 'K₃[Fe(CN)₆]', 'K₄[Fe(CN)₆]', '血赤', '濃青', '黄']
+      },
+      {
+        text: '銅は希硫酸に{0}が、熱濃硫酸や硝酸には溶けます。\nCu + 2H₂SO₄(熱濃) → {1} + SO₂↑ + 2H₂O\n3Cu + 8HNO₃(希) → 3Cu(NO₃)₂ + {2}↑ + 4H₂O',
+        answers: ['溶けません', 'CuSO₄', '2NO'],
+        bank: ['溶けません', '溶けます', '激しく反応します', 'CuSO₄', 'CuO', 'Cu(OH)₂', '2NO', '2NO₂', 'H₂']
+      },
+      {
+        text: 'Cu²⁺水溶液にNaOH水溶液を少量加えると{0}色の水酸化銅(Ⅱ)沈殿が生じます。加熱すると{1}色の酸化銅(Ⅱ)になります。さらに過剰のアンモニア水を加えると{2}色の錯イオン{3}を形成します。',
+        answers: ['青白', '黒', '深青', '[Cu(NH₃)₄]²⁺'],
+        bank: ['青白', '赤褐', '黒', '白', '深青', '淡緑', '[Cu(NH₃)₄]²⁺', '[Cu(NH₃)₂]⁺', '[Cu(OH)₄]²⁻']
+      }
+    ],
+    quiz: [
+      { type: 'mc', q: '鉄の製錬で使う鉱石はどれですか?', choices: ['赤鉄鉱 Fe₂O₃', '黄銅鉱 CuFeS₂', '方鉛鉱 PbS', '閃亜鉛鉱 ZnS'], ans: 0 },
+      { type: 'mc', q: 'Fe³⁺水溶液にKSCNを加えると何色になりますか?', choices: ['青紫', '濃青', '血赤', '黄'], ans: 2 },
+      { type: 'mc', q: 'Fe²⁺水溶液にK₃[Fe(CN)₆]を加えると何色の沈殿が生じますか?', choices: ['濃青', '赤褐', '黄', '白'], ans: 0 },
+      { type: 'mc', q: 'Cu²⁺水溶液の色はどれですか?', choices: ['青', '緑', '黄褐', '血赤'], ans: 0 },
+      { type: 'mc', q: '銅に濃硝酸を加えると発生する気体はどれですか?', choices: ['H₂', 'NO', 'NO₂', 'SO₂'], ans: 2 },
+      { type: 'short', q: 'ステンレス鋼はFeに何を加えた合金ですか? (2つ、スペース区切り)', ans: ['Cr Ni', 'Ni Cr', 'クロム ニッケル', 'ニッケル クロム'] },
+      { type: 'mc', q: 'CuSO₄·5H₂Oを加熱するとどうなりますか?', choices: ['色は変わらない', '青色が濃くなる', '白色になる', '黒色になる'], ans: 2 },
+      { type: 'mc', q: 'Cu²⁺に過剰のNH₃水を加えたときの錯イオンの色はどれですか?', choices: ['淡緑色', '深青色', '血赤色', '黄色'], ans: 1 }
+    ]
+  },
+
+  {
+    id: 'ag_etc',
+    name: '銀・クロム・マンガン',
+    symbol: 'Ag',
+    color: '#71717A',
+    colorD: '#52525B',
+    bgColor: '#F4F4F5',
+    intro: '銀Agは電気・熱伝導性が金属中No.1、装飾品やアクセサリーにも。クロムCrやマンガンMnは鉄の合金材料や酸化剤として重要。錯イオンの美しさも学びましょう!',
+    explain: [
+      { h: '★ 銀Agとハロゲン化銀 — 写真の主役', p: '銀Agは熱・電気伝導性が金属中で最も高い元素です。イオン化傾向は水素より小さいので、希硫酸・希塩酸には溶けませんが、硝酸や熱濃硫酸には溶けます。\n\n【ハロゲン化銀】AgClなどは光で分解する性質を利用して、昔のフィルム写真に使われていました。\n・AgF → 水に溶ける(例外!)\n・AgCl → 白色沈殿\n・AgBr → 淡黄色沈殿\n・AgI → 黄色沈殿\n\n【沈殿の覚え方】AgF以外は水に溶けない!' },
+      { h: '★★ Ag⁺と錯イオン — 溶けた!', p: 'Ag⁺にHClを加えると白色のAgCl沈殿ができます。ここに過剰のアンモニア水を加えると、沈殿が溶けます!\n\nAgCl + 2NH₃ → [Ag(NH₃)₂]⁺ + Cl⁻\n\nこの[Ag(NH₃)₂]⁺を「ジアンミン銀(Ⅰ)イオン」といい、直線形で配位数2。系統分析でAg⁺の確認に使います!\n\n他のAg⁺の反応:\n・NaOH → Ag₂O(褐色沈殿)\n・K₂CrO₄ → Ag₂CrO₄(赤褐色沈殿)' },
+      { h: '💡 金Au — 王水だけが溶かす!', p: '金は化学的にとても安定。希硫酸・希塩酸・硝酸・濃硫酸でも溶けません。ただし、王水(濃塩酸:濃硝酸 = 3:1)だけは金を溶かします!\n\n昔の錬金術師は金を作ろうと頑張りましたが、結局できませんでした。金は本当に特別な金属なんですね。' },
+      { h: '★ クロムCr — 色の変わる面白い元素', p: 'クロムには黄色と赤橙色のイオンがあり、酸・塩基で色が変わります!\n\n【CrO₄²⁻(クロム酸イオン)】黄色\n【Cr₂O₇²⁻(二クロム酸イオン)】赤橙色\n\n酸性にすると: 2CrO₄²⁻ + 2H⁺ → Cr₂O₇²⁻ + H₂O (黄→赤橙)\n塩基性にすると: Cr₂O₇²⁻ + 2OH⁻ → 2CrO₄²⁻ + H₂O (赤橙→黄)\n\n【CrO₄²⁻との沈殿】\n・Ag₂CrO₄ → 赤褐色\n・BaCrO₄ → 黄色\n・PbCrO₄ → 黄色(クロムイエロー、絵具!)' },
+      { h: '★ マンガンMn — 酸化剤の王様', p: 'マンガンの化合物はいろいろな場面で活躍します!\n\n【MnO₂(酸化マンガン(Ⅳ))】黒色\n・乾電池の材料\n・Cl₂、O₂の製造時の触媒や酸化剤として登場\n\n【KMnO₄(過マンガン酸カリウム)】黒紫色の結晶、水溶液は赤紫色\n・強力な酸化剤(酸性溶液中) → 無色のMn²⁺に変化\n・鉄の定量分析などに使用\n\nMnO₄⁻ + 8H⁺ + 5e⁻ → Mn²⁺ + 4H₂O' },
+      { h: '★★ 錯イオンのまとめ — 配位数と形', p: '金属イオンに配位子がくっついた「錯イオン」。形は配位数で決まります!\n\n【配位数2 → 直線形】\n・[Ag(NH₃)₂]⁺ (ジアンミン銀(Ⅰ)イオン) 無色\n\n【配位数4 → 正方形(平面)】\n・[Cu(NH₃)₄]²⁺ (テトラアンミン銅(Ⅱ)イオン) 深青色\n\n【配位数4 → 正四面体】\n・[Zn(NH₃)₄]²⁺ (テトラアンミン亜鉛(Ⅱ)イオン) 無色\n\n【配位数6 → 正八面体】\n・[Fe(CN)₆]³⁻ (ヘキサシアノ鉄(Ⅲ)酸イオン) 黄色\n・[Fe(CN)₆]⁴⁻ (ヘキサシアノ鉄(Ⅱ)酸イオン) 淡黄色\n\n【覚え方】2=直線、4=正方形or正四面体、6=正八面体' }
+    ],
+    keyPoints: [
+      '【暗記】銀Ag: 11族、熱・電気伝導性が金属中最大',
+      '★ Agは希硫酸・希塩酸に溶けない、硝酸や熱濃硫酸には溶ける',
+      '★★ Ag⁺の反応: Cl⁻→AgCl(白)・Br⁻→AgBr(淡黄)・I⁻→AgI(黄)',
+      '【暗記】AgFは水に溶ける例外!',
+      '★★ AgCl + 過剰NH₃水 → [Ag(NH₃)₂]⁺(錯イオン、直線形)',
+      '★ 金Au: 王水(濃塩酸:濃硝酸=3:1)のみに溶ける',
+      '★★ CrO₄²⁻(黄)+酸 ⇌ Cr₂O₇²⁻(赤橙) + 塩基',
+      '【暗記】Ag₂CrO₄(赤褐)、PbCrO₄(黄・絵具)、BaCrO₄(黄)',
+      '★ KMnO₄は強い酸化剤(酸性中) 赤紫→無色(Mn²⁺)',
+      '★★ 錯イオンの形: 配位数2=直線、4=正方形or四面体、6=正八面体'
+    ],
+    table: {
+      title: '銀イオンの反応まとめ',
+      headers: ['試薬', '結果'],
+      rows: [
+        ['HCl / Cl⁻', 'AgCl 白色沈殿 ★'],
+        ['AgCl + 過剰NH₃水', '[Ag(NH₃)₂]⁺ となり溶ける ★'],
+        ['Br⁻', 'AgBr 淡黄色沈殿'],
+        ['I⁻', 'AgI 黄色沈殿'],
+        ['NaOH', 'Ag₂O 褐色沈殿'],
+        ['K₂CrO₄', 'Ag₂CrO₄ 赤褐色沈殿']
+      ]
+    },
+    fillBlanks: [
+      {
+        text: '銀は熱・電気伝導性がすべての金属中{0}大きい元素です。銀は希硫酸や希塩酸には溶けません(イオン化傾向がHより小さい)が、{1}や熱濃硫酸には溶けます。金は{2}(濃塩酸:濃硝酸=3:1)のみに溶けます。',
+        answers: ['最も', '硝酸', '王水'],
+        bank: ['最も', '最も小さく', '硝酸', '食塩水', 'アンモニア水', '王水', '海水', '発煙硫酸']
+      },
+      {
+        text: '銀イオンAg⁺にCl⁻を加えると{0}色の{1}沈殿が生じます。これは過剰の{2}水に溶けて錯イオン{3}を形成します。これは銀の系統分析で銀イオンを検出する反応です。',
+        answers: ['白', 'AgCl', 'アンモニア', '[Ag(NH₃)₂]⁺'],
+        bank: ['白', '黄', '淡黄', '黒', 'AgCl', 'AgBr', 'AgI', 'アンモニア', 'NaOH', '塩酸', '[Ag(NH₃)₂]⁺', '[Ag(OH)₂]⁻', '[Ag(CN)₂]⁻']
+      },
+      {
+        text: 'クロム酸カリウムK₂CrO₄(黄色)に酸を加えると{0}色の{1}になります。\n2CrO₄²⁻ + 2H⁺ → {2} + H₂O\nAg⁺、Ba²⁺、Pb²⁺とCrO₄²⁻を加えるとそれぞれ色のついた沈殿が生成します。',
+        answers: ['赤橙', 'K₂Cr₂O₇(二クロム酸カリウム)', 'Cr₂O₇²⁻'],
+        bank: ['赤橙', '青', '緑', '黒', 'K₂Cr₂O₇(二クロム酸カリウム)', 'Cr(OH)₃', 'Cr₂O₃', 'Cr₂O₇²⁻', 'Cr(OH)₃', 'CrO₂²⁻']
+      }
+    ],
+    quiz: [
+      { type: 'mc', q: '金を溶かす液体はどれですか?', choices: ['濃硝酸', '濃塩酸', '王水', '熱濃硫酸'], ans: 2 },
+      { type: 'short', q: '王水は濃塩酸と濃硝酸の何対何の混合ですか? (例: 1:1)', ans: ['3:1'] },
+      { type: 'mc', q: 'Ag⁺にCl⁻を加えたときの沈殿の色はどれですか?', choices: ['白', '黄', '黒', '赤褐'], ans: 0 },
+      { type: 'mc', q: 'AgClは過剰のアンモニア水で何を形成して溶けますか?', choices: ['[Ag(NH₃)₂]⁺', '[Ag(OH)₂]⁻', '[Ag(NH₃)₄]⁺', '[AgCl₂]⁻'], ans: 0 },
+      { type: 'mc', q: 'クロム酸カリウムK₂CrO₄の水溶液は何色ですか?', choices: ['赤橙色', '黄色', '青色', '緑色'], ans: 1 },
+      { type: 'mc', q: '酸を加えて二クロム酸イオンになった水溶液の色はどれですか?', choices: ['赤橙色', '黄色', '青色', '緑色'], ans: 0 },
+      { type: 'mc', q: '[Cu(NH₃)₄]²⁺の形はどれですか?', choices: ['正四面体', '正方形(平面)', '正八面体', '直線'], ans: 1 },
+      { type: 'mc', q: '[Ag(NH₃)₂]⁺の形はどれですか?', choices: ['直線', '正方形', '正四面体', '正八面体'], ans: 0 }
+    ]
+  },
+
+  {
+    id: 'separation',
+    name: '金属イオンの分離',
+    symbol: '⚗',
+    color: '#0EA5E9',
+    colorD: '#0284C7',
+    bgColor: '#E0F2FE',
+    intro: '複数の金属イオンが混ざっていても、順番に沈殿させれば分けられます。これが「系統分析」。化学の名探偵ゲーム、犯人(金属イオン)を1つずつ見つけ出そう!',
+    explain: [
+      { h: '系統分析ってなに?', p: '水溶液の中に色々な金属イオンがまざっている時、それぞれがどのイオンかを当てる方法が「系統分析」です。ルールはシンプル:\n\n「順番に試薬を加えて、沈殿するイオンから順に分離していく」\n\nこれから6つの操作を順にやっていきます。それぞれの段階で何が沈殿するか、色は何かを覚えるのがポイント!' },
+      { h: '★ 第1操作: 希塩酸HClを加える', p: 'まず希塩酸を加えると、Ag⁺とPb²⁺が塩化物として沈殿します。\n\n・Ag⁺ + Cl⁻ → AgCl↓ (白色)\n・Pb²⁺ + 2Cl⁻ → PbCl₂↓ (白色)\n\n※ PbCl₂は熱湯に溶ける性質を利用して、Pb²⁺とAg⁺を分けることができます。' },
+      { h: '★ 第2操作: 酸性でH₂Sを通す', p: '希塩酸酸性の溶液にH₂Sを通すと、イオン化傾向が特に小さい金属のイオンが硫化物として沈殿します。\n\n・Cu²⁺ → CuS↓ (黒色)\n・Pb²⁺残り → PbS↓ (黒色)\n・Hg²⁺ → HgS↓ (黒色)\n・Cd²⁺ → CdS↓ (黄色)\n\n酸性でも沈殿する硫化物として覚えましょう。' },
+      { h: '★ 第3操作: 煮沸 → HNO₃ → NH₃水', p: '① 煮沸してH₂Sを飛ばす\n② 硝酸HNO₃を加えてFe²⁺をFe³⁺に酸化(酸化剤として)\n③ アンモニア水NH₃を加えて弱塩基性に\n\nすると:\n・Fe³⁺ → Fe(OH)₃↓ (赤褐色 ★)\n・Al³⁺ → Al(OH)₃↓ (白色)\n・Cr³⁺ → Cr(OH)₃↓ (灰緑色)' },
+      { h: '★ 第4操作: 塩基性でH₂Sを通す', p: 'アンモニア性の塩基性溶液でH₂Sを通すと、酸性では沈殿しなかったイオンが沈殿します。\n\n・Zn²⁺ → ZnS↓ (白色 ★)\n・Ni²⁺ → NiS↓ (黒色)\n・Co²⁺ → CoS↓ (黒色)\n・Mn²⁺ → MnS↓ (淡桃色)' },
+      { h: '★ 第5操作: (NH₄)₂CO₃を加える', p: '炭酸アンモニウム(NH₄)₂CO₃を加えると、アルカリ土類金属が炭酸塩として沈殿します。\n\n・Ca²⁺ → CaCO₃↓ (白)\n・Sr²⁺ → SrCO₃↓ (白)\n・Ba²⁺ → BaCO₃↓ (白)' },
+      { h: '★ 第6操作: 炎色反応でNa⁺、K⁺確認', p: 'ここまで残るのはNa⁺とK⁺だけ。これらは炎色反応で判別します!\n\n・Na⁺ → 黄色\n・K⁺ → 赤紫色\n\nこれで系統分析の完成! 各金属イオンを順番に見つけることができました。' },
+      { h: '💡 色と化学式を整理して覚えよう', p: '系統分析のカギは「色」です。試験でもよく出るので、以下の色は絶対に暗記!\n\n【白色沈殿】AgCl, PbCl₂, Al(OH)₃, ZnS, CaCO₃, BaSO₄\n【黄色沈殿】AgI, CdS, PbI₂, PbCrO₄, BaCrO₄\n【赤褐色沈殿】Fe(OH)₃\n【青白色沈殿】Cu(OH)₂\n【黒色沈殿】CuS, PbS, HgS, Ag₂S, FeS, NiS, CoS' }
+    ],
+    keyPoints: [
+      '★★ 第1操作: 希塩酸HCl → Ag⁺、Pb²⁺を AgCl(白)、PbCl₂(白)として沈殿',
+      '★★ 第2操作: H₂Sを酸性下で通す → Cu²⁺、Pb²⁺ → CuS(黒)、PbS(黒)',
+      '★★ 第3操作: 煮沸(H₂S除去) → HNO₃(酸化) → NH₃水 → Fe(OH)₃(赤褐)、Al(OH)₃(白)',
+      '★★ 第4操作: H₂S(塩基性下) → ZnS(白)、NiS(黒)、MnS(淡桃)',
+      '★★ 第5操作: (NH₄)₂CO₃ → CaCO₃、BaCO₃ などアルカリ土類の炭酸塩',
+      '★★ 第6操作: Na⁺、K⁺ は炎色反応で確認(黄、赤紫)',
+      '【暗記】ハロゲン化銀: AgF(可溶)、AgCl(白)、AgBr(淡黄)、AgI(黄)',
+      '【暗記】硫化物の色: CuS・PbS・HgS・FeS・NiS・CoS → 黒、CdS → 黄、ZnS → 白、MnS → 淡桃'
+    ],
+    table: {
+      title: '金属イオンの系統分析の流れ',
+      headers: ['操作', '加える試薬', '沈殿するイオン'],
+      rows: [
+        ['第1', '希塩酸 HCl', 'Ag⁺, Pb²⁺ → AgCl, PbCl₂ (白)'],
+        ['第2', 'H₂S (酸性)', 'Cu²⁺ → CuS (黒), Pb²⁺残り'],
+        ['第3', '煮沸+HNO₃, NH₃水', 'Fe³⁺, Al³⁺ → Fe(OH)₃(赤褐), Al(OH)₃(白)'],
+        ['第4', 'H₂S (塩基性)', 'Zn²⁺, Ni²⁺, Mn²⁺ → ZnS(白), NiS(黒), MnS(淡桃)'],
+        ['第5', '(NH₄)₂CO₃', 'Ca²⁺, Ba²⁺ → CaCO₃, BaCO₃ (白)'],
+        ['第6', '炎色反応', 'Na⁺(黄), K⁺(赤紫) を確認']
+      ]
+    },
+    fillBlanks: [
+      {
+        text: '金属イオンを系統的に分離・確認する操作を{0}といいます。まず{1}を加えてAg⁺、Pb²⁺を{2}とPbCl₂の白色沈殿として分離します。',
+        answers: ['系統分析', '希塩酸', 'AgCl'],
+        bank: ['系統分析', '定量分析', '中和滴定', '希塩酸', '濃塩酸', '希硫酸', 'AgCl', 'AgOH', 'Ag₂O']
+      },
+      {
+        text: '第2操作で、酸性下でH₂Sを通すとCu²⁺は{0}色の{1}沈殿を生じます。一方、H₂Sを除き、硝酸で酸化後アンモニア水を加えると、{2}色のFe(OH)₃と{3}色のAl(OH)₃が沈殿します。',
+        answers: ['黒', 'CuS', '赤褐', '白'],
+        bank: ['黒', '白', '黄', '青', 'CuS', 'CuO', 'Cu(OH)₂', '赤褐', '緑', '黒', '白', '青']
+      },
+      {
+        text: '塩基性下でH₂Sを通すと、{0}は白色のZnS沈殿を生じます。さらに(NH₄)₂CO₃を加えると、{1}イオンや{2}イオンが炭酸塩として沈殿します。最後に残った{3}と{4}は{5}反応で確認します。',
+        answers: ['Zn²⁺', 'Ca²⁺', 'Ba²⁺', 'Na⁺', 'K⁺', '炎色'],
+        bank: ['Zn²⁺', 'Cu²⁺', 'Fe²⁺', 'Ca²⁺', 'Ag⁺', 'Ba²⁺', 'Na⁺', 'Cl⁻', 'K⁺', '炎色', '沈殿', '中和']
+      }
+    ],
+    quiz: [
+      { type: 'mc', q: '希塩酸を加えて最初に沈殿する金属イオンはどれですか?', choices: ['Fe³⁺とAl³⁺', 'Ag⁺とPb²⁺', 'Cu²⁺とHg²⁺', 'Na⁺とK⁺'], ans: 1 },
+      { type: 'mc', q: '酸性下でH₂Sを通したときに沈殿しないのはどれですか?', choices: ['Cu²⁺', 'Pb²⁺', 'Hg²⁺', 'Zn²⁺'], ans: 3 },
+      { type: 'mc', q: 'Fe³⁺にアンモニア水を加えたときの沈殿の色はどれですか?', choices: ['白', '黄', '赤褐', '青'], ans: 2 },
+      { type: 'mc', q: '炭酸アンモニウム(NH₄)₂CO₃で沈殿するのはどれですか?', choices: ['Cu²⁺', 'Fe³⁺', 'Ca²⁺, Ba²⁺', 'Na⁺, K⁺'], ans: 2 },
+      { type: 'mc', q: 'Na⁺の確認法はどれですか?', choices: ['NaOH加える', 'H₂S加える', '炎色反応', '塩酸加える'], ans: 2 },
+      { type: 'mc', q: 'AgClの沈殿が過剰のアンモニア水で溶ける理由はどれですか?', choices: ['酸性になるから', '錯イオン[Ag(NH₃)₂]⁺を形成するから', '温度が上がるから', '酸化されるから'], ans: 1 }
+    ]
+  }
+];
+</script>
+
+<script>
+// ============================================================
+// Storage helpers — localStorage for persistence
+// ============================================================
+const STORAGE_KEY = 'chem-inorganic-progress-v2';
+
+function loadProgress() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch (e) {}
+  return {};
+}
+function saveProgress(data) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  } catch (e) {}
+}
+
+let state = {
+  progress: loadProgress(),
+  activeUnit: null,
+  tab: 'learn',      // learn | practice | test
+  blankIdx: 0,
+  // practice state
+  blanks: [],
+  bankUsed: [],
+  judged: false,
+  result: null,
+  startTime: 0,
+  timerId: null,
+  elapsed: 0,
+  // quiz state
+  quizI: 0,
+  quizAnswers: [],
+  quizChoice: null,
+  quizShortVal: '',
+  quizFeedback: null,
+  quizShowResult: false
+};
+
+// ============================================================
+// Helpers
+// ============================================================
+function escapeHtml(s) {
+  return String(s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+function classifyKeyPoint(kp) {
+  if (kp.startsWith('★★')) return 'star2';
+  if (kp.startsWith('★')) return 'star';
+  if (kp.startsWith('【暗記】')) return 'memorize';
+  return '';
+}
+
+function showConfetti() {
+  const colors = ['#FF6B9D', '#F59E0B', '#10B981', '#3B82F6', '#8B5CF6', '#EC4899', '#14B8A6'];
+  for (let i = 0; i < 60; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti';
+    el.style.left = (Math.random() * 100) + '%';
+    el.style.background = colors[i % colors.length];
+    el.style.borderRadius = (i % 2 === 0) ? '50%' : '2px';
+    const dur = 2 + Math.random() * 2;
+    const delay = Math.random() * 0.5;
+    el.style.animation = `fall ${dur}s ${delay}s ease-in forwards`;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), (dur + delay) * 1000 + 200);
+  }
+}
+
+function updateUnitProgress(unitId, patch) {
+  const p = state.progress[unitId] || {};
+  state.progress[unitId] = { ...p, ...patch };
+  saveProgress(state.progress);
+}
+
+// ============================================================
+// Render: Dashboard (unit list)
+// ============================================================
+function renderDashboard() {
+  const totalPassed = UNITS.filter(u => (state.progress[u.id] || {}).passed).length;
+  const totalReviews = UNITS.reduce((s, u) => s + ((state.progress[u.id] || {}).reviewCount || 0), 0);
+  const totalPct = Math.round(totalPassed / UNITS.length * 100);
+
+  let html = '<div class="container">';
+
+  // Header
+  html += `
+    <div class="header">
+      <div class="header-inner">
+        <div class="header-tag">⚗ CHEMISTRY LEARNING</div>
+        <h1 class="header-title">高校化学・無機化学</h1>
+        <div class="header-sub">江原予備校オリジナル × 数研出版 即効化学 準拠</div>
+        <div class="stat-row">
+          <div class="stat-card">
+            <div class="stat-label">進捗</div>
+            <div class="stat-val amber">${totalPassed} / ${UNITS.length} <span style="font-size:13px;color:#888;">単元</span></div>
+            <div class="stat-bar"><div class="stat-bar-fill" style="width:${totalPct}%"></div></div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">総復習回数</div>
+            <div class="stat-val purple">${totalReviews}<span style="font-size:13px;color:#888;"> 回</span></div>
+            <div style="font-size:11px;color:#666;margin-top:6px;">${totalReviews >= 30 ? '🏆 マスター級' : totalReviews >= 10 ? '🔥 がんばってる！' : '📚 積み重ね中'}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Legend
+  html += `
+    <div class="legend">
+      <div class="legend-title">🎯 自己評価マーク (単元ごとにタップで変更できます)</div>
+      <div class="legend-items">
+        <span><span class="mark-dot mark-A">A</span> OK</span>
+        <span><span class="mark-dot mark-B">B</span> 復習必要</span>
+        <span><span class="mark-dot mark-C">C</span> 何度も復習</span>
+      </div>
+    </div>
+  `;
+
+  // Grid
+  html += '<div class="grid">';
+  UNITS.forEach((u, i) => {
+    const p = state.progress[u.id] || {};
+    const cssVars = `--unit-color:${u.color};--unit-color-d:${u.colorD};--unit-bg:${u.bgColor};--unit-glow:${u.color}66`;
+    html += `
+      <div class="unit-card ${p.passed ? 'passed' : ''}" style="${cssVars}">
+        <div class="unit-card-blob"></div>
+        <div class="unit-card-inner">
+          <div class="unit-head">
+            <div class="unit-symbol">${escapeHtml(u.symbol)}</div>
+            <div style="flex:1;">
+              <div class="unit-idx">単元 ${i + 1}</div>
+              <div class="unit-title">${escapeHtml(u.name)}</div>
+            </div>
+            ${p.passed ? '<div class="unit-check">✅</div>' : ''}
+          </div>
+          <div class="unit-intro-mini">${escapeHtml(u.intro.slice(0, 58))}…</div>
+          <div class="unit-stats">
+            <span>🔁 ${p.reviewCount || 0}回</span>
+            <span>📝 ${p.testsPassed || 0}回</span>
+            ${p.bestScore ? `<span>🏆 ${p.bestScore}%</span>` : ''}
+          </div>
+          <div class="mark-row">
+            ${['A','B','C'].map(m => `
+              <button class="mark-btn ${m} ${p.mark === m ? 'active' : ''}"
+                onclick="event.stopPropagation(); setMark('${u.id}', '${m}')">${m}</button>
+            `).join('')}
+          </div>
+          <button class="start-btn" onclick="openUnit('${u.id}')">学習を開始 →</button>
+        </div>
+      </div>
+    `;
+  });
+  html += '</div>';
+
+  html += `
+    <div class="reset-row">
+      <button class="reset-btn" onclick="resetAll()">🗑 すべての記録をリセット</button>
+    </div>
+    <div class="footer">江原予備校 × 数研出版 即効化学 対応 / 高校化学 無機化学 学習プログラム</div>
+  `;
+
+  html += '</div>';
+  document.getElementById('app').innerHTML = html;
+}
+
+function setMark(unitId, mark) {
+  const current = (state.progress[unitId] || {}).mark;
+  updateUnitProgress(unitId, { mark: current === mark ? null : mark });
+  renderDashboard();
+}
+
+function resetAll() {
+  if (!confirm('すべての学習記録を削除します。よろしいですか？')) return;
+  state.progress = {};
+  saveProgress({});
+  renderDashboard();
+}
+
+function openUnit(unitId) {
+  state.activeUnit = unitId;
+  state.tab = 'learn';
+  state.blankIdx = 0;
+  resetPracticeState();
+  resetQuizState();
+  window.scrollTo(0, 0);
+  renderUnitView();
+}
+
+function backToDashboard() {
+  state.activeUnit = null;
+  stopTimer();
+  renderDashboard();
+}
+
+function goNextUnit() {
+  const idx = UNITS.findIndex(u => u.id === state.activeUnit);
+  const next = UNITS[(idx + 1) % UNITS.length];
+  openUnit(next.id);
+}
+
+function setTab(tab) {
+  state.tab = tab;
+  state.blankIdx = 0;
+  resetPracticeState();
+  resetQuizState();
+  renderUnitView();
+}
+
+function resetPracticeState() {
+  const u = UNITS.find(x => x.id === state.activeUnit);
+  if (!u) return;
+  const fb = u.fillBlanks[state.blankIdx];
+  if (!fb) return;
+  state.blanks = fb.answers.map(() => null);
+  state.bankUsed = fb.bank.map(() => false);
+  state.judged = false;
+  state.result = null;
+  state.elapsed = 0;
+  state.startTime = Date.now();
+}
+
+function resetQuizState() {
+  state.quizI = 0;
+  state.quizAnswers = [];
+  state.quizChoice = null;
+  state.quizShortVal = '';
+  state.quizFeedback = null;
+  state.quizShowResult = false;
+}
+
+function startTimer() {
+  stopTimer();
+  state.timerId = setInterval(() => {
+    state.elapsed = Math.floor((Date.now() - state.startTime) / 1000);
+    const el = document.getElementById('timer-display');
+    if (el) el.textContent = '⏱ ' + state.elapsed + '秒';
+  }, 500);
+}
+
+function stopTimer() {
+  if (state.timerId) {
+    clearInterval(state.timerId);
+    state.timerId = null;
+  }
+}
+
+// ============================================================
+// Render: Unit Detail View
+// ============================================================
+function renderUnitView() {
+  const u = UNITS.find(x => x.id === state.activeUnit);
+  if (!u) { renderDashboard(); return; }
+  const p = state.progress[u.id] || {};
+  const cssVars = `--unit-color:${u.color};--unit-color-d:${u.colorD};--unit-bg:${u.bgColor};--unit-glow:${u.color}66`;
+
+  let html = `<div class="container" style="${cssVars}">`;
+
+  // Header
+  html += `
+    <div class="unit-page-header">
+      <button class="back-btn" onclick="backToDashboard()">← 単元表</button>
+      <div class="unit-head-info">
+        <div class="unit-head-name">${escapeHtml(u.name)} ${p.passed ? '✅' : ''}</div>
+        <div class="unit-head-meta">復習 ${p.reviewCount || 0}回 ・ 合格 ${p.testsPassed || 0}回 ${p.bestScore ? '・ 最高 ' + p.bestScore + '%' : ''}</div>
+      </div>
+      <div class="unit-symbol" style="width:40px;height:40px;font-size:16px;">${escapeHtml(u.symbol)}</div>
+    </div>
+  `;
+
+  // Tabs
+  html += `
+    <div class="tabs">
+      <button class="tab-btn ${state.tab === 'learn' ? 'active' : ''}" onclick="setTab('learn')">📖 学ぶ</button>
+      <button class="tab-btn ${state.tab === 'practice' ? 'active' : ''}" onclick="setTab('practice')">✏️ 練習</button>
+      <button class="tab-btn ${state.tab === 'test' ? 'active' : ''}" onclick="setTab('test')">📝 確認テスト</button>
+    </div>
+  `;
+
+  if (state.tab === 'learn') html += renderLearnTab(u);
+  else if (state.tab === 'practice') html += renderPracticeTab(u);
+  else if (state.tab === 'test') html += renderTestTab(u);
+
+  html += '</div>';
+  document.getElementById('app').innerHTML = html;
+
+  // Start timer for practice
+  if (state.tab === 'practice' && !state.judged) {
+    state.startTime = Date.now() - (state.elapsed * 1000);
+    startTimer();
+  } else {
+    stopTimer();
+  }
+}
+
+// ---------- Learn Tab ----------
+function renderLearnTab(u) {
+  let html = '';
+
+  // Audio placeholder
+  html += `
+    <div class="audio-box">
+      <div class="audio-icon">🎧</div>
+      <div style="flex:1;">
+        <div class="audio-title">音声解説(4分)</div>
+        <div class="audio-sub">この単元のポイントを音声で解説します。(準備中)</div>
+      </div>
+      <button class="audio-btn">▶ 再生</button>
+    </div>
+  `;
+
+  // Intro
+  html += `
+    <div class="card">
+      <div class="intro-box">${escapeHtml(u.intro)}</div>
+    </div>
+  `;
+
+  // Explanation sections
+  html += '<div class="card"><div class="card-h">📚 解説</div>';
+  u.explain.forEach(sec => {
+    html += `
+      <div class="explain-section">
+        <div class="explain-h">${escapeHtml(sec.h)}</div>
+        <div class="explain-p">${escapeHtml(sec.p)}</div>
+      </div>
+    `;
+  });
+  html += '</div>';
+
+  // Key points
+  html += '<div class="card"><div class="card-h">⭐ 重要ポイント</div>';
+  html += '<ul class="kp-list">';
+  u.keyPoints.forEach(kp => {
+    const cls = classifyKeyPoint(kp);
+    html += `<li class="${cls}">${escapeHtml(kp)}</li>`;
+  });
+  html += '</ul>';
+  html += `
+    <div style="margin-top:12px;padding:10px 14px;background:#f9fafb;border-radius:8px;font-size:12px;color:#666;">
+      凡例: <span style="color:#EF4444;font-weight:700;">★★</span> 超重要 ・
+      <span style="color:#F59E0B;font-weight:700;">★</span> 重要 ・
+      <span style="color:#3B82F6;font-weight:700;">【暗記】</span> 覚える項目
+    </div>
+  `;
+  html += '</div>';
+
+  // Table
+  if (u.table) {
+    html += '<div class="card"><div class="card-h">📊 ' + escapeHtml(u.table.title) + '</div>';
+    html += '<div style="overflow-x:auto;"><table class="info-table"><thead><tr>';
+    u.table.headers.forEach(h => html += `<th>${escapeHtml(h)}</th>`);
+    html += '</tr></thead><tbody>';
+    u.table.rows.forEach(row => {
+      html += '<tr>';
+      row.forEach(cell => html += `<td>${escapeHtml(cell)}</td>`);
+      html += '</tr>';
+    });
+    html += '</tbody></table></div></div>';
+  }
+
+  // Nav buttons
+  html += `
+    <div class="two-btn-row">
+      <button class="btn-secondary" onclick="backToDashboard()">📋 単元表に戻る</button>
+      <button class="btn-primary" onclick="goNextUnit()">次の単元へ →</button>
+    </div>
+  `;
+
+  return html;
+}
+
+// ---------- Practice Tab ----------
+function renderPracticeTab(u) {
+  const fb = u.fillBlanks[state.blankIdx];
+  if (!fb) return '<div class="card">問題がありません。</div>';
+
+  // Build problem text with blanks
+  let problemHtml = escapeHtml(fb.text);
+  fb.answers.forEach((_, i) => {
+    const val = state.blanks[i];
+    let cls = 'blank';
+    let content = '___';
+    if (state.judged && state.result) {
+      const r = state.result[i];
+      cls += r ? ' filled correct' : ' filled wrong';
+      content = escapeHtml(val || '___');
+    } else if (val !== null) {
+      cls += ' filled';
+      content = escapeHtml(val);
+    }
+    const clickHandler = (val !== null && !state.judged) ? `onclick="removeFromBlank(${i})"` : '';
+    problemHtml = problemHtml.replace(
+      '{' + i + '}',
+      `<span class="${cls}" ${clickHandler}>${content}</span>`
+    );
+  });
+
+  const allFilled = state.blanks.every(x => x !== null);
+
+  let html = '';
+  html += `
+    <div class="practice-meta">
+      <span>📝 問題 ${state.blankIdx + 1} / ${u.fillBlanks.length}</span>
+      <span id="timer-display">⏱ ${state.elapsed}秒</span>
+    </div>
+  `;
+
+  html += '<div class="practice-card">';
+  html += `<div class="practice-top"><span>語群から選んで空欄をタップしてください</span></div>`;
+  html += `<div class="problem-text">${problemHtml}</div>`;
+
+  // Bank
+  html += '<div class="bank-label">📦 語群</div>';
+  html += '<div class="bank">';
+  fb.bank.forEach((w, i) => {
+    const disabled = state.bankUsed[i] || state.judged;
+    html += `<button class="bank-word" ${disabled ? 'disabled' : ''} onclick="placeWord(${i})">${escapeHtml(w)}</button>`;
+  });
+  html += '</div>';
+
+  // Judge / feedback area
+  if (!state.judged) {
+    html += `
+      <div class="judge-row">
+        <button class="judge-btn" ${allFilled ? '' : 'disabled'} onclick="judge()">答え合わせ →</button>
+        ${allFilled ? '' : '<span style="font-size:13px;color:#888;">すべての空欄を埋めてください</span>'}
+      </div>
+    `;
+  } else {
+    const allOk = state.result.every(x => x);
+    if (allOk) {
+      html += `
+        <div class="feedback-pass">🎉 合格です！ よくできました！ (${state.elapsed}秒)</div>
+        <div style="margin-top:12px;">
+          <button class="judge-btn" onclick="nextPractice()">次の問題へ →</button>
+        </div>
+      `;
+    } else {
+      html += `
+        <div class="feedback-fail">…と少し！ 間違った部分を見直しましょう。</div>
+        <div style="margin-top:8px;font-size:13px;color:#666;">赤くなった箇所の語を、もう一度選びなおしてください。</div>
+      `;
+    }
+  }
+  html += '</div>';
+
+  // Nav
+  html += `
+    <div class="nav-row">
+      <button class="nav-btn prev" ${state.blankIdx === 0 ? 'disabled' : ''} onclick="prevPractice()">← 前へ</button>
+      <button class="nav-btn next" onclick="nextPractice()">
+        ${state.blankIdx < u.fillBlanks.length - 1 ? '次の問題 →' : '練習終了 → 単元表'}
+      </button>
+    </div>
+  `;
+
+  return html;
+}
+
+function placeWord(bankIdx) {
+  const u = UNITS.find(x => x.id === state.activeUnit);
+  const fb = u.fillBlanks[state.blankIdx];
+  if (state.judged) return;
+  // Find first empty blank
+  const emptyIdx = state.blanks.findIndex(x => x === null);
+  if (emptyIdx === -1) return;
+  state.blanks[emptyIdx] = fb.bank[bankIdx];
+  state.bankUsed[bankIdx] = true;
+  renderUnitView();
+}
+
+function removeFromBlank(blankIdx) {
+  if (state.judged) return;
+  const u = UNITS.find(x => x.id === state.activeUnit);
+  const fb = u.fillBlanks[state.blankIdx];
+  const word = state.blanks[blankIdx];
+  if (!word) return;
+  // Free the first matching used bank slot
+  const bIdx = fb.bank.findIndex((w, i) => w === word && state.bankUsed[i]);
+  if (bIdx !== -1) state.bankUsed[bIdx] = false;
+  state.blanks[blankIdx] = null;
+  renderUnitView();
+}
+
+function judge() {
+  const u = UNITS.find(x => x.id === state.activeUnit);
+  const fb = u.fillBlanks[state.blankIdx];
+  const result = state.blanks.map((v, i) => v === fb.answers[i]);
+  state.result = result;
+  state.judged = true;
+  stopTimer();
+  renderUnitView();
+
+  const allOk = result.every(x => x);
+  if (allOk) {
+    showConfetti();
+    // Bump review count
+    const p = state.progress[u.id] || {};
+    updateUnitProgress(u.id, { reviewCount: (p.reviewCount || 0) + 1 });
+  } else {
+    // After 1.8s, return wrong words to bank
+    setTimeout(() => {
+      if (!state.judged) return; // guard
+      const fb2 = u.fillBlanks[state.blankIdx];
+      state.blanks.forEach((v, i) => {
+        if (!result[i] && v !== null) {
+          const bIdx = fb2.bank.findIndex((w, j) => w === v && state.bankUsed[j]);
+          if (bIdx !== -1) state.bankUsed[bIdx] = false;
+          state.blanks[i] = null;
+        }
+      });
+      state.judged = false;
+      state.result = null;
+      state.startTime = Date.now() - (state.elapsed * 1000);
+      startTimer();
+      renderUnitView();
+    }, 1800);
+  }
+}
+
+function nextPractice() {
+  const u = UNITS.find(x => x.id === state.activeUnit);
+  if (state.blankIdx < u.fillBlanks.length - 1) {
+    state.blankIdx++;
+    resetPracticeState();
+    renderUnitView();
+  } else {
+    backToDashboard();
+  }
+}
+
+function prevPractice() {
+  if (state.blankIdx > 0) {
+    state.blankIdx--;
+    resetPracticeState();
+    renderUnitView();
+  }
+}
+
+// ---------- Test Tab ----------
+function renderTestTab(u) {
+  if (state.quizShowResult) return renderQuizResult(u);
+
+  const q = u.quiz[state.quizI];
+  if (!q) return '<div class="card">問題がありません。</div>';
+
+  let html = '<div class="quiz-card">';
+
+  // Top: progress dots + count
+  html += '<div class="quiz-top">';
+  html += '<div style="font-size:13px;color:#888;">問題 ' + (state.quizI + 1) + ' / ' + u.quiz.length + '</div>';
+  html += '<div class="quiz-progress-dots">';
+  u.quiz.forEach((_, i) => {
+    let cls = 'quiz-dot';
+    if (i < state.quizAnswers.length) cls += state.quizAnswers[i] ? ' ok' : ' ng';
+    else if (i === state.quizI) cls += ' current';
+    html += '<div class="' + cls + '"></div>';
+  });
+  html += '</div></div>';
+
+  html += '<div class="quiz-q">' + escapeHtml(q.q) + '</div>';
+
+  // Feedback (between answer and next)
+  if (state.quizFeedback) {
+    if (state.quizFeedback.ok) {
+      html += '<div class="quiz-fb-ok">✅ 正解です！</div>';
+    } else {
+      html += '<div class="quiz-fb-ng">❌ 不正解 — 正解は: ' + escapeHtml(state.quizFeedback.correct) + '</div>';
+    }
+  }
+
+  // Input area
+  if (q.type === 'mc') {
+    html += '<div class="quiz-choices">';
+    q.choices.forEach((c, i) => {
+      const selected = state.quizChoice === i;
+      const disabled = state.quizFeedback !== null;
+      html += '<button class="quiz-choice' + (selected ? ' selected' : '') + '" ' +
+              (disabled ? 'disabled' : '') +
+              ' onclick="selectChoice(' + i + ')">' +
+              '<span class="num">' + (i + 1) + '.</span>' + escapeHtml(c) + '</button>';
+    });
+    html += '</div>';
+
+    if (!state.quizFeedback) {
+      html += '<div style="text-align:right;"><button class="quiz-submit" ' +
+              (state.quizChoice === null ? 'disabled' : '') +
+              ' onclick="submitQuiz()">回答する</button></div>';
+    }
+  } else {
+    // short answer
+    html += '<input class="quiz-short-input" id="quiz-short" placeholder="答えを入力..." ' +
+            'value="' + escapeHtml(state.quizShortVal) + '" ' +
+            (state.quizFeedback !== null ? 'disabled' : '') +
+            ' oninput="state.quizShortVal=this.value;document.getElementById(\'submit-short\').disabled=!this.value.trim();">';
+    if (!state.quizFeedback) {
+      html += '<div style="text-align:right;"><button id="submit-short" class="quiz-submit" ' +
+              (state.quizShortVal.trim() === '' ? 'disabled' : '') +
+              ' onclick="submitQuiz()">回答する</button></div>';
+    }
+  }
+
+  html += '</div>';
+
+  // Back button
+  html += '<div style="margin-top:14px;text-align:center;">' +
+          '<button class="back-btn" onclick="backToDashboard()">← 単元表に戻る</button></div>';
+
+  return html;
+}
+
+function selectChoice(i) {
+  state.quizChoice = i;
+  renderUnitView();
+}
+
+function submitQuiz() {
+  const u = UNITS.find(x => x.id === state.activeUnit);
+  const q = u.quiz[state.quizI];
+  let ok = false;
+  let correctStr = '';
+
+  if (q.type === 'mc') {
+    if (state.quizChoice === null) return;
+    ok = state.quizChoice === q.ans;
+    correctStr = q.choices[q.ans];
+  } else {
+    const val = state.quizShortVal.trim();
+    if (!val) return;
+    // Check against any acceptable answer
+    const answers = Array.isArray(q.ans) ? q.ans : [q.ans];
+    ok = answers.some(a =>
+      val.toLowerCase() === a.toLowerCase() ||
+      val === a
+    );
+    correctStr = answers[0];
+  }
+
+  state.quizAnswers.push(ok);
+  state.quizFeedback = { ok, correct: correctStr };
+  renderUnitView();
+
+  setTimeout(() => {
+    // Advance
+    if (state.quizI < u.quiz.length - 1) {
+      state.quizI++;
+      state.quizChoice = null;
+      state.quizShortVal = '';
+      state.quizFeedback = null;
+      renderUnitView();
+    } else {
+      // Show result
+      const correct = state.quizAnswers.filter(x => x).length;
+      const pct = Math.round(correct / u.quiz.length * 100);
+      const passed = pct >= 70;
+      const p = state.progress[u.id] || {};
+      const newBest = Math.max(p.bestScore || 0, pct);
+      const patch = { bestScore: newBest };
+      if (passed) {
+        patch.passed = true;
+        patch.testsPassed = (p.testsPassed || 0) + 1;
+      }
+      updateUnitProgress(u.id, patch);
+      if (passed) showConfetti();
+      state.quizShowResult = true;
+      state.quizFeedback = null;
+      renderUnitView();
+    }
+  }, 1200);
+}
+
+function renderQuizResult(u) {
+  const correct = state.quizAnswers.filter(x => x).length;
+  const pct = Math.round(correct / u.quiz.length * 100);
+  const passed = pct >= 70;
+
+  let html = '<div class="quiz-card">';
+  html += '<div class="result-icon">' + (passed ? '🎉' : '💪') + '</div>';
+  html += '<div class="result-score ' + (passed ? 'pass' : 'fail') + '">' +
+          correct + ' / ' + u.quiz.length + ' (' + pct + '%)</div>';
+  html += '<div class="result-msg">' +
+          (passed ? '合格です！単元表にチェックがつきました ✅' : '70%以上で合格です。もう一度がんばりましょう！') +
+          '</div>';
+
+  // Review
+  html += '<div class="result-review">';
+  u.quiz.forEach((q, i) => {
+    const ok = state.quizAnswers[i];
+    const correctStr = q.type === 'mc' ? q.choices[q.ans] : (Array.isArray(q.ans) ? q.ans[0] : q.ans);
+    html += '<div class="result-item">' +
+            '<div>' + (ok ? '✅' : '❌') + ' Q' + (i + 1) + '. ' + escapeHtml(q.q) + '</div>';
+    if (!ok) {
+      html += '<div class="wrong-info">正解: ' + escapeHtml(correctStr) + '</div>';
+    }
+    html += '</div>';
+  });
+  html += '</div>';
+
+  html += '<div class="result-btns">';
+  html += '<button class="result-retry" onclick="retryQuiz()">🔄 もう一度挑戦</button>';
+  if (passed) {
+    html += '<button class="result-back" onclick="goNextUnit()">次の単元へ →</button>';
+  }
+  html += '<button class="result-back neutral" onclick="backToDashboard()">📋 単元表に戻る</button>';
+  html += '</div>';
+
+  html += '</div>';
+  return html;
+}
+
+function retryQuiz() {
+  resetQuizState();
+  renderUnitView();
+}
+
+// ============================================================
+// Init
+// ============================================================
+document.addEventListener('DOMContentLoaded', function () {
+  renderDashboard();
+});
+
+// Fallback if DOMContentLoaded already fired
+if (document.readyState === 'interactive' || document.readyState === 'complete') {
+  renderDashboard();
+}
+</script>
+
+</body>
+</html>
